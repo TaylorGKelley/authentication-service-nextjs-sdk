@@ -134,8 +134,8 @@ var routeMap = {
 };
 var routeHandler3 = (req, context) => __async(null, null, function* () {
   const { authService: routeId3 } = yield context.params;
-  const routeHandler4 = routeMap[routeId3];
-  return routeHandler4(req);
+  const handler = routeMap[routeId3];
+  return handler(req);
 });
 function handleAuth() {
   return routeHandler3;

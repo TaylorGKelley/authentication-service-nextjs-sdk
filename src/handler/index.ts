@@ -13,9 +13,9 @@ const routeHandler = async (
 ) => {
   const { authService: routeId } = await context.params;
 
-  const routeHandler = routeMap[routeId];
+  const handler = routeMap[routeId];
 
-  return routeHandler(req);
+  return handler(req);
 };
 
 export function handleAuth() {
