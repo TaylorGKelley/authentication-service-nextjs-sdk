@@ -64,7 +64,10 @@ const authMiddleware = async (
 };
 
 export const withAuth = (
-  middleware: NextMiddleware,
+  middleware: (
+    request: NextRequest & { user: User | null },
+    event: NextFetchEvent
+  ) => NextMiddlewareResult | Promise<NextMiddlewareResult>,
   options: AuthMiddlewareConfig
 ) => {
   return async (

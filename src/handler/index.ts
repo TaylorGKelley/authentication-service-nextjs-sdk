@@ -7,11 +7,11 @@ const routeMap = {
   [callback.routeId]: callback.routeHandler,
 };
 
-const routeHandler = (
+const routeHandler = async (
   req: NextRequest,
-  context: { params: { authService: string } }
+  context: { params: Promise<{ authService: string }> }
 ) => {
-  const routeId = context.params.authService;
+  const { authService: routeId } = await context.params;
 
   const routeHandler = routeMap[routeId];
 

@@ -132,11 +132,11 @@ var routeMap = {
   [refresh_default.routeId]: refresh_default.routeHandler,
   [callback_default.routeId]: callback_default.routeHandler
 };
-var routeHandler3 = (req, context) => {
-  const routeId3 = context.params.authService;
+var routeHandler3 = (req, context) => __async(null, null, function* () {
+  const { authService: routeId3 } = yield context.params;
   const routeHandler4 = routeMap[routeId3];
   return routeHandler4(req);
-};
+});
 function handleAuth() {
   return routeHandler3;
 }

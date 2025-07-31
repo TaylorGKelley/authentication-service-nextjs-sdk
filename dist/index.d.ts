@@ -1,5 +1,6 @@
+import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import * as next_server from 'next/server';
-import { NextMiddleware, NextRequest, NextFetchEvent } from 'next/server';
+import { NextRequest, NextFetchEvent } from 'next/server';
 
 type User = {
     id: number;
@@ -12,14 +13,16 @@ type AuthMiddlewareConfig = {
     };
 };
 
-declare const withAuth: (middleware: NextMiddleware, options: AuthMiddlewareConfig) => (...args: [req: NextRequest & {
+declare const withAuth: (middleware: (request: NextRequest & {
+    user: User | null;
+}, event: NextFetchEvent) => NextMiddlewareResult | Promise<NextMiddlewareResult>, options: AuthMiddlewareConfig) => (...args: [req: NextRequest & {
     user: User | null;
 }, event: NextFetchEvent]) => Promise<void>;
 
 declare function handleAuth(): (req: NextRequest, context: {
-    params: {
+    params: Promise<{
         authService: string;
-    };
-}) => next_server.NextResponse<string> | Promise<next_server.NextResponse<string>>;
+    }>;
+}) => Promise<next_server.NextResponse<string>>;
 
 export { type AuthMiddlewareConfig, type User, handleAuth, withAuth };
