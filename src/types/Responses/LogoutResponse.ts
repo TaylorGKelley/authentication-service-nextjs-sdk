@@ -1,3 +1,3 @@
-type LogoutResponse = {};
+type LogoutResponse = unknown;
 
 export default LogoutResponse;

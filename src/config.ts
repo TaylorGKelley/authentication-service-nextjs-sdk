@@ -6,7 +6,8 @@ const config = {
   SITE_UNAUTHORIZED_URL: process.env.SITE_UNAUTHORIZED_URL!,
   SITE_LOGIN_URL: process.env.SITE_LOGIN_URL!,
   AUTH_POST_LOGOUT_REDIRECT: process.env.AUTH_POST_LOGOUT_REDIRECT!,
-  PUBLIC_ROUTE_PERMISSION: process.env.PUBLIC_ROUTE_PERMISSION || 'public',
+  AUTH_PUBLIC_ROUTE_PERMISSION:
+    process.env.AUTH_PUBLIC_ROUTE_PERMISSION || 'public',
 } as const;
 
 export default config;

@@ -49,7 +49,7 @@ const authMiddleware = async (
       !options.protectedPaths[url.pathname].some(
         (permission) =>
           permissions.includes(permission) ||
-          permission === config.PUBLIC_ROUTE_PERMISSION
+          permission === config.AUTH_PUBLIC_ROUTE_PERMISSION
       )
     ) {
       // unauthorized
@@ -59,7 +59,7 @@ const authMiddleware = async (
     // redirect to login
     return await onSuccess({ user });
   } catch (error) {
-    // handle error
+    return NextResponse.redirect(new URL(config.SITE_LOGIN_URL));
   }
 };
 

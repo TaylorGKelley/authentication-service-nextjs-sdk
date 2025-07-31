@@ -1,10 +1,8 @@
+import { Response } from './Response';
 import User from '../User';
 
-type InitializeResponse = {
+type InitializeResponse = Response<{
   user: User;
-  permission: string[];
-  accessToken: string;
-  csrfToken: string;
-};
+}>;
 
 export default InitializeResponse;

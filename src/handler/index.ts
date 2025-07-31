@@ -1,10 +1,14 @@
 import { type NextRequest } from 'next/server';
 import refresh from './refresh';
 import callback from './callback';
+import logout from './logout';
+import initialize from './initialize';
 
 const routeMap = {
   [refresh.routeId]: refresh.routeHandler,
   [callback.routeId]: callback.routeHandler,
+  [logout.routeId]: logout.routeHandler,
+  [initialize.routeId]: initialize.routeHandler,
 };
 
 const routeHandler = async (

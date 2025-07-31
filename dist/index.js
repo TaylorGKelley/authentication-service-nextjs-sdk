@@ -66,7 +66,7 @@ var config = {
   SITE_UNAUTHORIZED_URL: process.env.SITE_UNAUTHORIZED_URL,
   SITE_LOGIN_URL: process.env.SITE_LOGIN_URL,
   AUTH_POST_LOGOUT_REDIRECT: process.env.AUTH_POST_LOGOUT_REDIRECT,
-  PUBLIC_ROUTE_PERMISSION: process.env.PUBLIC_ROUTE_PERMISSION || "public"
+  AUTH_PUBLIC_ROUTE_PERMISSION: process.env.AUTH_PUBLIC_ROUTE_PERMISSION || "public"
 };
 var config_default = config;
 
@@ -127,12 +127,13 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
       return import_server.NextResponse.redirect(new import_node_url.URL(config_default.SITE_LOGIN_URL));
     }
     if (!options.protectedPaths[url.pathname].some(
-      (permission) => permissions.includes(permission) || permission === config_default.PUBLIC_ROUTE_PERMISSION
+      (permission) => permissions.includes(permission) || permission === config_default.AUTH_PUBLIC_ROUTE_PERMISSION
     )) {
       return import_server.NextResponse.redirect(new import_node_url.URL(config_default.SITE_UNAUTHORIZED_URL));
     }
     return yield onSuccess({ user });
   } catch (error) {
+    return import_server.NextResponse.redirect(new import_node_url.URL(config_default.SITE_LOGIN_URL));
   }
 });
 var withAuth = (middleware, options) => {
@@ -149,7 +150,7 @@ var withAuth = (middleware, options) => {
 var import_server2 = require("next/server");
 var routeId = "refresh";
 var routeHandler = (req) => {
-  return new import_server2.NextResponse("");
+  return import_server2.NextResponse.json({ success: true, data: {} });
 };
 var refresh_default = { routeId, routeHandler };
 
@@ -157,22 +158,48 @@ var refresh_default = { routeId, routeHandler };
 var import_server3 = require("next/server");
 var routeId2 = "callback";
 var routeHandler2 = (req) => {
-  return new import_server3.NextResponse("");
+  return import_server3.NextResponse.redirect(new URL(config_default.SITE_URL));
 };
 var callback_default = { routeId: routeId2, routeHandler: routeHandler2 };
+
+// src/handler/logout.ts
+var import_server4 = require("next/server");
+var routeId3 = "logout";
+var routeHandler3 = (req) => {
+  return import_server4.NextResponse.json({});
+};
+var logout_default = { routeId: routeId3, routeHandler: routeHandler3 };
+
+// src/handler/initialize.ts
+var import_server5 = require("next/server");
+var routeId4 = "initialize";
+var routeHandler4 = (req) => {
+  return import_server5.NextResponse.json({
+    success: true,
+    data: {
+      user: {
+        id: 0,
+        email: ""
+      }
+    }
+  });
+};
+var initialize_default = { routeId: routeId4, routeHandler: routeHandler4 };
 
 // src/handler/index.ts
 var routeMap = {
   [refresh_default.routeId]: refresh_default.routeHandler,
-  [callback_default.routeId]: callback_default.routeHandler
+  [callback_default.routeId]: callback_default.routeHandler,
+  [logout_default.routeId]: logout_default.routeHandler,
+  [initialize_default.routeId]: initialize_default.routeHandler
 };
-var routeHandler3 = (req, context) => __async(null, null, function* () {
-  const { authService: routeId3 } = yield context.params;
-  const handler = routeMap[routeId3];
+var routeHandler5 = (req, context) => __async(null, null, function* () {
+  const { authService: routeId5 } = yield context.params;
+  const handler = routeMap[routeId5];
   return handler(req);
 });
 function handleAuth() {
-  return routeHandler3;
+  return routeHandler5;
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

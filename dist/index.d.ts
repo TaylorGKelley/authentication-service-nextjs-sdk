@@ -23,6 +23,6 @@ declare function handleAuth(): (req: NextRequest, context: {
     params: Promise<{
         authService: string;
     }>;
-}) => Promise<next_server.NextResponse<string>>;
+}) => Promise<next_server.NextResponse<unknown>>;
 
 export { type AuthMiddlewareConfig, type User, handleAuth, withAuth };

@@ -1,5 +1,5 @@
-type RefreshResponse = {
-  accessToken: string;
-};
+import { Response } from './Response';
+
+type RefreshResponse = Response<{}>;
 
 export default RefreshResponse;
