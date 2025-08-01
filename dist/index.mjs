@@ -66,6 +66,52 @@ var getCSRFToken = () => __async(null, null, function* () {
   }
 });
 
+// src/apiClient/index.ts
+import { cookies as cookies2 } from "next/headers";
+function fetchWithAuth(input, init) {
+  return __async(this, null, function* () {
+    var _a;
+    try {
+      const cookieStore = yield cookies2();
+      let accessToken = (_a = cookieStore.get("accessToken")) == null ? void 0 : _a.value;
+      const csrfToken = yield getCSRFToken();
+      const response = yield fetch(input, __spreadProps(__spreadValues({}, init), {
+        headers: __spreadProps(__spreadValues({}, init == null ? void 0 : init.headers), {
+          Authorization: `Bearer ${accessToken}`,
+          "X-CSRF-Token": csrfToken || ""
+        })
+      }));
+      const data = yield response.json();
+      return {
+        success: true,
+        data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message
+      };
+    }
+  });
+}
+
+// src/utils/getPermissions.ts
+var getPermissions = cache(() => __async(null, null, function* () {
+  try {
+    const response = yield fetchWithAuth(
+      `${config_default.AUTH_SERVICE_HOST_URL}/api/v1/user-permissions/${config_default.AUTH_SERVICE_CONNECTED_SERVICE_ID}`,
+      {
+        method: "get"
+      }
+    );
+    if (!response.success) throw new Error(response.message);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}));
+var getPermissions_default = getPermissions;
+
 // src/utils/isExpiredToken.ts
 import jwt from "jsonwebtoken";
 function isExpiredToken(token) {
@@ -75,7 +121,7 @@ function isExpiredToken(token) {
 }
 
 // src/utils/refreshTokens.ts
-import { cookies as cookies2 } from "next/headers";
+import { cookies as cookies3 } from "next/headers";
 
 // src/utils/parseCookie.ts
 var parseCookie = (name, cookieHeader) => {
@@ -127,7 +173,7 @@ var parseCookie = (name, cookieHeader) => {
 // src/utils/refreshTokens.ts
 var refreshTokens = () => __async(null, null, function* () {
   var _a;
-  const cookieStore = yield cookies2();
+  const cookieStore = yield cookies3();
   let csrfToken = yield getCSRFToken();
   if (!csrfToken) {
     const csrfResponse = yield fetch(
@@ -182,71 +228,6 @@ var refreshTokens = () => __async(null, null, function* () {
   }
 });
 var refreshTokens_default = refreshTokens;
-
-// src/apiClient/index.ts
-import { cookies as cookies3 } from "next/headers";
-function fetchWithAuth(input, init) {
-  return __async(this, null, function* () {
-    var _a;
-    try {
-      const cookieStore = yield cookies3();
-      let accessToken = (_a = cookieStore.get("accessToken")) == null ? void 0 : _a.value;
-      const csrfToken = yield getCSRFToken();
-      let response = void 0;
-      if (accessToken && isExpiredToken(accessToken)) {
-        response = yield fetch(input, __spreadProps(__spreadValues({}, init), {
-          headers: __spreadProps(__spreadValues({}, init == null ? void 0 : init.headers), {
-            Authorization: `Bearer ${accessToken}`,
-            "X-CSRF-Token": csrfToken || ""
-          })
-        }));
-      }
-      if (response && response.status >= 200 && response.status < 300) {
-        const data2 = yield response.json();
-        return { success: true, data: data2 };
-      }
-      if (!accessToken || !response || response.status === 401) {
-        accessToken = (yield refreshTokens_default()).accessToken;
-      }
-      response = yield fetch(input, __spreadProps(__spreadValues({}, init), {
-        headers: __spreadProps(__spreadValues({}, init == null ? void 0 : init.headers), {
-          Authorization: `Bearer ${accessToken}`,
-          "X-CSRF-Token": csrfToken || ""
-        })
-      }));
-      if (response.status > 200 && response.status > 300) {
-        throw new Error(response.statusText);
-      }
-      const data = yield response.json();
-      return {
-        success: true,
-        data
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message
-      };
-    }
-  });
-}
-
-// src/utils/getPermissions.ts
-var getPermissions = cache(() => __async(null, null, function* () {
-  try {
-    const response = yield fetchWithAuth(
-      `${config_default.AUTH_SERVICE_HOST_URL}/api/v1/user-permissions/${config_default.AUTH_SERVICE_CONNECTED_SERVICE_ID}`,
-      {
-        method: "get"
-      }
-    );
-    if (!response.success) throw new Error(response.message);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-}));
-var getPermissions_default = getPermissions;
 
 // src/middleware/index.ts
 import {
