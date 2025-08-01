@@ -31,7 +31,7 @@ const authMiddleware = async (
       return NextResponse.redirect(new URL(config.SITE_LOGIN_URL));
     }
 
-    if (accessToken && isExpiredToken(accessToken)) {
+    if (!accessToken || isExpiredToken(accessToken)) {
       await refreshTokens();
     }
 

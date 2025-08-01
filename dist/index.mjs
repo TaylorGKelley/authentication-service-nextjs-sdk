@@ -245,7 +245,7 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
     if (!refreshToken) {
       return NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
-    if (accessToken && isExpiredToken(accessToken)) {
+    if (!accessToken || isExpiredToken(accessToken)) {
       yield refreshTokens_default();
     }
     const { user, permissions } = yield getPermissions_default();
