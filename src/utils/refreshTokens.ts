@@ -11,20 +11,34 @@ const refreshTokens = async () => {
 
   if (!csrfToken) {
     // fetch csrf token for this session
-    const csrfResponse = (await fetch(
+    const csrfResponse = await fetch(
       config.AUTH_SERVICE_HOST_URL + '/api/v1/refresh-token',
       {
         method: 'get',
       }
-    ).then((r) => r.json())) as { csrfToken: string };
+    );
 
-    cookieStore.set('csrfToken', csrfResponse.csrfToken, {
+    const { csrfToken: newCSRFToken } = (await csrfResponse.json()) as {
+      csrfToken: string;
+    };
+    const xsrfCookie = parseCookie(
+      '_csrf',
+      csrfResponse.headers.getSetCookie()
+    );
+
+    cookieStore.set('_csrf', xsrfCookie.Value, {
+      httpOnly: xsrfCookie.HttpOnly || true,
+      expires: xsrfCookie.Expires,
+      path: xsrfCookie.Path ?? '/',
+      sameSite: xsrfCookie.SameSite || 'lax',
+    });
+    cookieStore.set('csrfToken', newCSRFToken, {
       httpOnly: true,
       sameSite: 'lax',
       path: '/',
     });
 
-    csrfToken = csrfResponse.csrfToken;
+    csrfToken = newCSRFToken;
   }
 
   const response = await fetch(

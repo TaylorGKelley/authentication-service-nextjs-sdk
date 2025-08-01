@@ -172,7 +172,7 @@ var parseCookie = (name, cookieHeader) => {
 
 // src/utils/refreshTokens.ts
 var refreshTokens = () => __async(null, null, function* () {
-  var _a;
+  var _a, _b;
   const cookieStore = yield cookies3();
   let csrfToken = yield getCSRFToken();
   if (!csrfToken) {
@@ -181,13 +181,24 @@ var refreshTokens = () => __async(null, null, function* () {
       {
         method: "get"
       }
-    ).then((r) => r.json());
-    cookieStore.set("csrfToken", csrfResponse.csrfToken, {
+    );
+    const { csrfToken: newCSRFToken } = yield csrfResponse.json();
+    const xsrfCookie = parseCookie(
+      "_csrf",
+      csrfResponse.headers.getSetCookie()
+    );
+    cookieStore.set("_csrf", xsrfCookie.Value, {
+      httpOnly: xsrfCookie.HttpOnly || true,
+      expires: xsrfCookie.Expires,
+      path: (_a = xsrfCookie.Path) != null ? _a : "/",
+      sameSite: xsrfCookie.SameSite || "lax"
+    });
+    cookieStore.set("csrfToken", newCSRFToken, {
       httpOnly: true,
       sameSite: "lax",
       path: "/"
     });
-    csrfToken = csrfResponse.csrfToken;
+    csrfToken = newCSRFToken;
   }
   const response = yield fetch(
     config_default.AUTH_SERVICE_HOST_URL + "/api/v1/refresh-token",
@@ -215,7 +226,7 @@ var refreshTokens = () => __async(null, null, function* () {
     cookieStore.set("refreshToken", refreshCookie.Value, {
       httpOnly: refreshCookie.HttpOnly || true,
       expires: refreshCookie.Expires,
-      path: (_a = refreshCookie.Path) != null ? _a : "/",
+      path: (_b = refreshCookie.Path) != null ? _b : "/",
       sameSite: refreshCookie.SameSite || "lax"
     });
     if (!resData.success) {
