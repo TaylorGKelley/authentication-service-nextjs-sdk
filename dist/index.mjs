@@ -257,11 +257,9 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
       return NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
     if (!accessToken || isExpiredToken(accessToken)) {
-      console.log("refreshed");
       yield refreshTokens_default();
     }
     const { user, permissions } = yield getPermissions_default();
-    console.log(permissions);
     if (!user) {
       return NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
@@ -278,7 +276,7 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
 var withAuth = (middleware, options) => {
   return (...args) => __async(null, null, function* () {
     const req = args[0];
-    yield authMiddleware(req, options, (_0) => __async(null, [_0], function* ({ user }) {
+    return yield authMiddleware(req, options, (_0) => __async(null, [_0], function* ({ user }) {
       args[0].user = user;
       return yield middleware(...args);
     }));

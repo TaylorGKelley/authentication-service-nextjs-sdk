@@ -32,13 +32,10 @@ const authMiddleware = async (
     }
 
     if (!accessToken || isExpiredToken(accessToken)) {
-      console.log('refreshed');
       await refreshTokens();
     }
 
     const { user, permissions } = await getPermissions();
-
-    console.log(permissions);
 
     if (!user) {
       return NextResponse.redirect(new URL(config.SITE_LOGIN_URL));
@@ -74,7 +71,7 @@ export const withAuth = (
     ...args: [req: NextRequest & { user: User | null }, event: NextFetchEvent]
   ) => {
     const req = args[0];
-    await authMiddleware(req, options, async ({ user }) => {
+    return await authMiddleware(req, options, async ({ user }) => {
       args[0].user = user;
       return await middleware(...args);
     });
