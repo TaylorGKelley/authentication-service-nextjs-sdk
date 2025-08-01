@@ -50,6 +50,7 @@ const refreshTokens = async () => {
       },
     }
   );
+  console.log(response.status, await response.json());
 
   if (response.status == 200 || response.status == 201) {
     const resData = (await response.json()) as RefreshResponse;
@@ -79,7 +80,7 @@ const refreshTokens = async () => {
       return resData.data;
     }
   } else {
-    throw new Error('Invalid Refresh Token');
+    throw new Error('Failed to refresh token');
   }
 };
 

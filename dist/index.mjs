@@ -209,6 +209,7 @@ var refreshTokens = () => __async(null, null, function* () {
       }
     }
   );
+  console.log(response.status, yield response.json());
   if (response.status == 200 || response.status == 201) {
     const resData = yield response.json();
     const { accessToken } = yield response.json();
@@ -235,7 +236,7 @@ var refreshTokens = () => __async(null, null, function* () {
       return resData.data;
     }
   } else {
-    throw new Error("Invalid Refresh Token");
+    throw new Error("Failed to refresh token");
   }
 });
 var refreshTokens_default = refreshTokens;
