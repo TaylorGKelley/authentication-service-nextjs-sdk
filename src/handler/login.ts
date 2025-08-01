@@ -6,6 +6,8 @@ import { NextResponse } from 'next/server';
 const routeId = 'login';
 
 const routeHandler: RouteHandler<LoginResponse> = (req) => {
+  const body = req.body;
+
   return NextResponse.json({
     success: true,
     data: {
