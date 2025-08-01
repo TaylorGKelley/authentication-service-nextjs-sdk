@@ -351,21 +351,57 @@ var routeHandler5 = (_req) => __async(null, null, function* () {
 });
 var csrf_default = { routeId: routeId5, routeHandler: routeHandler5 };
 
+// src/handler/login.ts
+import { NextResponse as NextResponse7 } from "next/server";
+var routeId6 = "login";
+var routeHandler6 = (req) => {
+  const body = req.body;
+  return NextResponse7.json({
+    success: true,
+    data: {
+      accessToken: "",
+      user: {
+        id: 0,
+        email: ""
+      }
+    }
+  });
+};
+var login_default = { routeId: routeId6, routeHandler: routeHandler6 };
+
+// src/handler/register.ts
+import { NextResponse as NextResponse8 } from "next/server";
+var routeId7 = "register";
+var routeHandler7 = (req) => {
+  return NextResponse8.json({
+    success: true,
+    data: {
+      user: {
+        id: 0,
+        email: ""
+      }
+    }
+  });
+};
+var register_default = { routeId: routeId7, routeHandler: routeHandler7 };
+
 // src/handler/index.ts
 var routeMap = {
   [refresh_default.routeId]: refresh_default.routeHandler,
   [csrf_default.routeId]: csrf_default.routeHandler,
+  [initialize_default.routeId]: initialize_default.routeHandler,
   [callback_default.routeId]: callback_default.routeHandler,
   [logout_default.routeId]: logout_default.routeHandler,
-  [initialize_default.routeId]: initialize_default.routeHandler
+  [login_default.routeId]: login_default.routeHandler,
+  [register_default.routeId]: register_default.routeHandler
 };
-var routeHandler6 = (req, context) => __async(null, null, function* () {
-  const { authService: routeId6 } = yield context.params;
-  const handler = routeMap[routeId6];
+var routeHandler8 = (req, context) => __async(null, null, function* () {
+  const { authService: routeId8 } = yield context.params;
+  const handler = routeMap[routeId8];
   return handler(req);
 });
 function handleAuth() {
-  return routeHandler6;
+  return routeHandler8;
 }
 export {
   fetchWithAuth,
