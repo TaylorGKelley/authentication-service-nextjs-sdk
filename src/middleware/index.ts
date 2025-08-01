@@ -1,4 +1,3 @@
-import { URL } from 'node:url';
 import config from '@/config';
 import type AuthMiddlewareConfig from '@/types/AuthMiddlewareConfig';
 import type User from '@/types/User';

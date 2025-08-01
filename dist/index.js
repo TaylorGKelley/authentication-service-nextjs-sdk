@@ -73,9 +73,6 @@ __export(index_exports, {
 });
 module.exports = __toCommonJS(index_exports);
 
-// src/middleware/index.ts
-var import_node_url = require("url");
-
 // src/config.ts
 var config = {
   AUTH_SERVICE_CONNECTED_SERVICE_ID: process.env.AUTH_SERVICE_CONNECTED_SERVICE_ID,
@@ -212,23 +209,23 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
     const refreshToken = (_a = req.cookies.get("refreshToken")) == null ? void 0 : _a.value;
     let accessToken = (_b = req.cookies.get("accessToken")) == null ? void 0 : _b.value;
     if (!refreshToken) {
-      return import_server.NextResponse.redirect(new import_node_url.URL(config_default.SITE_LOGIN_URL));
+      return import_server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
     if (accessToken && isExpiredToken(accessToken)) {
       accessToken = (yield refreshTokens_default()).accessToken;
     }
     const { user, permissions } = yield fetchPermissions_default();
     if (!user) {
-      return import_server.NextResponse.redirect(new import_node_url.URL(config_default.SITE_LOGIN_URL));
+      return import_server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
     if (!options.protectedPaths[url.pathname].some(
       (permission) => permissions.includes(permission) || permission === config_default.AUTH_PUBLIC_ROUTE_PERMISSION
     )) {
-      return import_server.NextResponse.redirect(new import_node_url.URL(config_default.SITE_UNAUTHORIZED_URL));
+      return import_server.NextResponse.redirect(new URL(config_default.SITE_UNAUTHORIZED_URL));
     }
     return yield onSuccess({ user });
   } catch (error) {
-    return import_server.NextResponse.redirect(new import_node_url.URL(config_default.SITE_LOGIN_URL));
+    return import_server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
   }
 });
 var withAuth = (middleware, options) => {

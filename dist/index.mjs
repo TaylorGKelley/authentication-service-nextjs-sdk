@@ -38,9 +38,6 @@ var __async = (__this, __arguments, generator) => {
   });
 };
 
-// src/middleware/index.ts
-import { URL as URL2 } from "url";
-
 // src/config.ts
 var config = {
   AUTH_SERVICE_CONNECTED_SERVICE_ID: process.env.AUTH_SERVICE_CONNECTED_SERVICE_ID,
@@ -179,23 +176,23 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
     const refreshToken = (_a = req.cookies.get("refreshToken")) == null ? void 0 : _a.value;
     let accessToken = (_b = req.cookies.get("accessToken")) == null ? void 0 : _b.value;
     if (!refreshToken) {
-      return NextResponse.redirect(new URL2(config_default.SITE_LOGIN_URL));
+      return NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
     if (accessToken && isExpiredToken(accessToken)) {
       accessToken = (yield refreshTokens_default()).accessToken;
     }
     const { user, permissions } = yield fetchPermissions_default();
     if (!user) {
-      return NextResponse.redirect(new URL2(config_default.SITE_LOGIN_URL));
+      return NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
     if (!options.protectedPaths[url.pathname].some(
       (permission) => permissions.includes(permission) || permission === config_default.AUTH_PUBLIC_ROUTE_PERMISSION
     )) {
-      return NextResponse.redirect(new URL2(config_default.SITE_UNAUTHORIZED_URL));
+      return NextResponse.redirect(new URL(config_default.SITE_UNAUTHORIZED_URL));
     }
     return yield onSuccess({ user });
   } catch (error) {
-    return NextResponse.redirect(new URL2(config_default.SITE_LOGIN_URL));
+    return NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
   }
 });
 var withAuth = (middleware, options) => {
