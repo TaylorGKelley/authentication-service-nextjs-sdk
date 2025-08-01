@@ -1,3 +1,4 @@
+import fetchWithAuth from '@/apiClient';
 import config from '@/config';
 import User from '@/types/User';
 
@@ -8,13 +9,16 @@ type PermissionResponse = {
 
 const fetchPermissions = async () => {
   try {
-    const response = await fetch(`${config.SITE_URL}/api/auth/permissions`, {
-      method: 'get',
-    });
+    const response = await fetchWithAuth<PermissionResponse>(
+      `${config.AUTH_SERVICE_HOST_URL}/api/v1/user-permissions/${config.AUTH_SERVICE_CONNECTED_SERVICE_ID}`,
+      {
+        method: 'get',
+      }
+    );
 
-    const data = (await response.json()) as PermissionResponse;
+    if (!response.success) throw new Error(response.message);
 
-    return data;
+    return response.data;
   } catch (error) {
     throw error;
   }

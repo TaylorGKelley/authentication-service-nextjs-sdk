@@ -1,22 +1,17 @@
 import InitializeResponse from '@/types/Responses/InitializeResponse';
 import type RouteHandler from '@/types/RouteHandler';
+import fetchPermissions from '@/utils/fetchPermissions';
 import { NextResponse } from 'next/server';
 
 const routeId = 'initialize';
 
-const routeHandler: RouteHandler<InitializeResponse> = (req) => {
+const routeHandler: RouteHandler<InitializeResponse> = async (req) => {
   // fetch user data from api/checking auth state
-
-  // return user object
+  const data = await fetchPermissions();
 
   return NextResponse.json({
     success: true,
-    data: {
-      user: {
-        id: 0,
-        email: '',
-      },
-    },
+    data,
   });
 };
 

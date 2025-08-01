@@ -3,9 +3,11 @@ import refresh from './refresh';
 import callback from './callback';
 import logout from './logout';
 import initialize from './initialize';
+import csrf from './csrf';
 
 const routeMap = {
   [refresh.routeId]: refresh.routeHandler,
+  [csrf.routeId]: csrf.routeHandler,
   [callback.routeId]: callback.routeHandler,
   [logout.routeId]: logout.routeHandler,
   [initialize.routeId]: initialize.routeHandler,
