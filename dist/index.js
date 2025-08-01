@@ -395,8 +395,7 @@ var routeHandler6 = (req) => __async(null, null, function* () {
     path: "/",
     sameSite: "strict"
   });
-  const body = req.body;
-  return import_server7.NextResponse.json({
+  const res = import_server7.NextResponse.json({
     success: true,
     data: {
       accessToken: "",
@@ -406,6 +405,12 @@ var routeHandler6 = (req) => __async(null, null, function* () {
       }
     }
   });
+  res.cookies.set("test2", "testy", {
+    httpOnly: true,
+    path: "/",
+    sameSite: "strict"
+  });
+  return res;
 });
 var login_default = { routeId: routeId6, routeHandler: routeHandler6 };
 

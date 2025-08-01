@@ -14,9 +14,9 @@ const routeHandler: RouteHandler<LoginResponse> = async (req) => {
     sameSite: 'strict',
   });
 
-  const body = req.body;
+  // const body = req.body;
 
-  return NextResponse.json({
+  const res = NextResponse.json<LoginResponse>({
     success: true,
     data: {
       accessToken: '',
@@ -26,6 +26,14 @@ const routeHandler: RouteHandler<LoginResponse> = async (req) => {
       },
     },
   });
+
+  res.cookies.set('test2', 'testy', {
+    httpOnly: true,
+    path: '/',
+    sameSite: 'strict',
+  });
+
+  return res;
 };
 
 export default { routeId, routeHandler };
