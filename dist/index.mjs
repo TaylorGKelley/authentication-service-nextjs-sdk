@@ -352,9 +352,16 @@ var routeHandler5 = (_req) => __async(null, null, function* () {
 var csrf_default = { routeId: routeId5, routeHandler: routeHandler5 };
 
 // src/handler/login.ts
+import { cookies as cookies3 } from "next/headers";
 import { NextResponse as NextResponse7 } from "next/server";
 var routeId6 = "login";
-var routeHandler6 = (req) => {
+var routeHandler6 = (req) => __async(null, null, function* () {
+  const cookieStore = yield cookies3();
+  cookieStore.set("test", "test", {
+    httpOnly: true,
+    path: "/",
+    sameSite: "strict"
+  });
   const body = req.body;
   return NextResponse7.json({
     success: true,
@@ -366,7 +373,7 @@ var routeHandler6 = (req) => {
       }
     }
   });
-};
+});
 var login_default = { routeId: routeId6, routeHandler: routeHandler6 };
 
 // src/handler/register.ts

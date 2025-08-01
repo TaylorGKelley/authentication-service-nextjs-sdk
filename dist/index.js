@@ -385,9 +385,16 @@ var routeHandler5 = (_req) => __async(null, null, function* () {
 var csrf_default = { routeId: routeId5, routeHandler: routeHandler5 };
 
 // src/handler/login.ts
+var import_headers3 = require("next/headers");
 var import_server7 = require("next/server");
 var routeId6 = "login";
-var routeHandler6 = (req) => {
+var routeHandler6 = (req) => __async(null, null, function* () {
+  const cookieStore = yield (0, import_headers3.cookies)();
+  cookieStore.set("test", "test", {
+    httpOnly: true,
+    path: "/",
+    sameSite: "strict"
+  });
   const body = req.body;
   return import_server7.NextResponse.json({
     success: true,
@@ -399,7 +406,7 @@ var routeHandler6 = (req) => {
       }
     }
   });
-};
+});
 var login_default = { routeId: routeId6, routeHandler: routeHandler6 };
 
 // src/handler/register.ts
