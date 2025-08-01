@@ -67,6 +67,7 @@ var __async = (__this, __arguments, generator) => {
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
+  fetchWithAuth: () => fetchWithAuth,
   handleAuth: () => handleAuth,
   withAuth: () => withAuth
 });
@@ -404,6 +405,7 @@ function handleAuth() {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  fetchWithAuth,
   handleAuth,
   withAuth
 });

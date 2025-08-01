@@ -25,4 +25,15 @@ declare function handleAuth(): (req: NextRequest, context: {
     }>;
 }) => Promise<next_server.NextResponse<unknown>>;
 
-export { type AuthMiddlewareConfig, type User, handleAuth, withAuth };
+type Response<T> = DataResponse<T> | ErrorResponse;
+type DataResponse<T> = {
+    success: true;
+    data: T;
+};
+type ErrorResponse = {
+    success: false;
+    message: string;
+};
+declare function fetchWithAuth<T = any>(input: string | URL | globalThis.Request, init?: RequestInit): Promise<Response<T>>;
+
+export { type AuthMiddlewareConfig, type User, fetchWithAuth, handleAuth, withAuth };

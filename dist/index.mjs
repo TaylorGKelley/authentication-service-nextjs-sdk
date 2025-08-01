@@ -371,6 +371,7 @@ function handleAuth() {
   return routeHandler6;
 }
 export {
+  fetchWithAuth,
   handleAuth,
   withAuth
 };
