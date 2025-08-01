@@ -68,7 +68,6 @@ var __async = (__this, __arguments, generator) => {
 var index_exports = {};
 __export(index_exports, {
   fetchWithAuth: () => fetchWithAuth,
-  handleAuth: () => handleAuth,
   withAuth: () => withAuth
 });
 module.exports = __toCommonJS(index_exports);
@@ -279,9 +278,11 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
       return import_server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
     if (!accessToken || isExpiredToken(accessToken)) {
+      console.log("refreshed");
       yield refreshTokens_default();
     }
     const { user, permissions } = yield getPermissions_default();
+    console.log(permissions);
     if (!user) {
       return import_server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
@@ -304,220 +305,8 @@ var withAuth = (middleware, options) => {
     }));
   });
 };
-
-// src/handler/refresh.ts
-var import_server2 = require("next/server");
-var routeId = "refresh";
-var routeHandler = (_req) => __async(null, null, function* () {
-  var _a;
-  try {
-    const csrfToken = yield getCSRFToken();
-    const response = yield fetch(
-      `${config_default.AUTH_SERVICE_HOST_URL}/api/v1/refresh`,
-      {
-        method: "post",
-        headers: {
-          "X-CSRF-Token": csrfToken
-        }
-      }
-    );
-    if (response.status < 200 || response.status >= 300) {
-      throw new Error(response.statusText);
-    }
-    const { accessToken } = yield response.json();
-    const refreshToken = (_a = response.headers.getSetCookie().find((cookie) => cookie.startsWith("refreshToken"))) == null ? void 0 : _a.split(";")[0].split("=")[1];
-    const result = import_server2.NextResponse.json({
-      success: true,
-      data: {
-        accessToken: ""
-      }
-    });
-    result.cookies.set("refreshToken", refreshToken, {
-      httpOnly: true,
-      path: "/",
-      sameSite: "strict",
-      secure: true,
-      expires: 7 * 24 * 60 * 60 * 1e3
-      // 7 days
-    });
-    result.cookies.set("accessToken", accessToken, {
-      httpOnly: true,
-      path: "/",
-      sameSite: "strict",
-      secure: true,
-      expires: 15 * 60 * 1e3
-      // 15 minutes
-    });
-    return result;
-  } catch (error) {
-    return import_server2.NextResponse.json({
-      success: false,
-      error: error.message
-    });
-  }
-});
-var refresh_default = { routeId, routeHandler };
-
-// src/handler/callback.ts
-var import_server3 = require("next/server");
-var routeId2 = "callback";
-var routeHandler2 = (req) => {
-  return import_server3.NextResponse.redirect(new URL(config_default.SITE_URL));
-};
-var callback_default = { routeId: routeId2, routeHandler: routeHandler2 };
-
-// src/handler/logout.ts
-var import_server4 = require("next/server");
-var routeId3 = "logout";
-var routeHandler3 = (_req) => __async(null, null, function* () {
-  try {
-    const response = yield fetchWithAuth(
-      `${config_default.AUTH_SERVICE_HOST_URL}/api/v1/logout`,
-      {
-        method: "get"
-      }
-    );
-    if (!response.success) {
-      throw new Error(response.message);
-    }
-    const result = import_server4.NextResponse.json({
-      success: true,
-      data: void 0
-    });
-    result.cookies.delete("accessToken");
-    result.cookies.delete("refreshToken");
-    return result;
-  } catch (error) {
-    return import_server4.NextResponse.json({
-      success: false,
-      error: error.message
-    });
-  }
-});
-var logout_default = { routeId: routeId3, routeHandler: routeHandler3 };
-
-// src/handler/initialize.ts
-var import_server5 = require("next/server");
-var routeId4 = "initialize";
-var routeHandler4 = (req) => __async(null, null, function* () {
-  const data = yield getPermissions_default();
-  return import_server5.NextResponse.json({
-    success: true,
-    data
-  });
-});
-var initialize_default = { routeId: routeId4, routeHandler: routeHandler4 };
-
-// src/handler/csrf.ts
-var import_server6 = require("next/server");
-var routeId5 = "csrf";
-var routeHandler5 = (_req) => __async(null, null, function* () {
-  var _a;
-  try {
-    const response = yield fetch(
-      `${config_default.AUTH_SERVICE_HOST_URL}/api/v1/csrf-token`,
-      {
-        method: "get"
-      }
-    );
-    if (response.status != 200) {
-      throw new Error(response.statusText);
-    }
-    const data = yield response.json();
-    const nextResponse = import_server6.NextResponse.json({
-      success: true,
-      data: {
-        csrfToken: data.csrfToken
-      }
-    });
-    nextResponse.cookies.set("csrfToken", data.csrfToken, {
-      httpOnly: true,
-      path: "/",
-      sameSite: "lax"
-    });
-    const csrfSessionKey = (_a = response.headers.getSetCookie().find((val) => val.startsWith("_csrf"))) == null ? void 0 : _a.split(";")[0].split("=")[1];
-    nextResponse.cookies.set("_csrf", csrfSessionKey, {
-      httpOnly: true,
-      path: "/",
-      sameSite: "strict"
-    });
-    return nextResponse;
-  } catch (error) {
-    return import_server6.NextResponse.json({
-      success: false,
-      error: error.message
-    });
-  }
-});
-var csrf_default = { routeId: routeId5, routeHandler: routeHandler5 };
-
-// src/handler/login.ts
-var import_headers4 = require("next/headers");
-var import_server7 = require("next/server");
-var routeId6 = "login";
-var routeHandler6 = (req) => __async(null, null, function* () {
-  const cookieStore = yield (0, import_headers4.cookies)();
-  cookieStore.set("test", "test", {
-    httpOnly: true,
-    path: "/",
-    sameSite: "strict"
-  });
-  const res = import_server7.NextResponse.json({
-    success: true,
-    data: {
-      accessToken: "",
-      user: {
-        id: 0,
-        email: ""
-      }
-    }
-  });
-  res.cookies.set("test2", "testy", {
-    httpOnly: true,
-    path: "/",
-    sameSite: "strict"
-  });
-  return res;
-});
-var login_default = { routeId: routeId6, routeHandler: routeHandler6 };
-
-// src/handler/register.ts
-var import_server8 = require("next/server");
-var routeId7 = "register";
-var routeHandler7 = (req) => {
-  return import_server8.NextResponse.json({
-    success: true,
-    data: {
-      user: {
-        id: 0,
-        email: ""
-      }
-    }
-  });
-};
-var register_default = { routeId: routeId7, routeHandler: routeHandler7 };
-
-// src/handler/index.ts
-var routeMap = {
-  [refresh_default.routeId]: refresh_default.routeHandler,
-  [csrf_default.routeId]: csrf_default.routeHandler,
-  [initialize_default.routeId]: initialize_default.routeHandler,
-  [callback_default.routeId]: callback_default.routeHandler,
-  [logout_default.routeId]: logout_default.routeHandler,
-  [login_default.routeId]: login_default.routeHandler,
-  [register_default.routeId]: register_default.routeHandler
-};
-var routeHandler8 = (req, context) => __async(null, null, function* () {
-  const { authService: routeId8 } = yield context.params;
-  const handler = routeMap[routeId8];
-  return handler(req);
-});
-function handleAuth() {
-  return routeHandler8;
-}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   fetchWithAuth,
-  handleAuth,
   withAuth
 });

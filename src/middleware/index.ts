@@ -32,10 +32,13 @@ const authMiddleware = async (
     }
 
     if (!accessToken || isExpiredToken(accessToken)) {
+      console.log('refreshed');
       await refreshTokens();
     }
 
     const { user, permissions } = await getPermissions();
+
+    console.log(permissions);
 
     if (!user) {
       return NextResponse.redirect(new URL(config.SITE_LOGIN_URL));
