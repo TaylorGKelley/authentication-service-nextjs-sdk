@@ -258,6 +258,7 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
     }
     if (!accessToken || isExpiredToken(accessToken)) {
       yield refreshTokens_default();
+      console.log("refreshed tokens");
     }
     const { user, permissions } = yield getPermissions_default();
     if (!user) {
@@ -270,6 +271,7 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
     }
     return yield onSuccess({ user });
   } catch (error) {
+    console.error(error);
     return NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
   }
 });

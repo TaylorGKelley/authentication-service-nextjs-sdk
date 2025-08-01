@@ -33,6 +33,7 @@ const authMiddleware = async (
 
     if (!accessToken || isExpiredToken(accessToken)) {
       await refreshTokens();
+      console.log('refreshed tokens');
     }
 
     const { user, permissions } = await getPermissions();
@@ -56,6 +57,7 @@ const authMiddleware = async (
     // redirect to login
     return await onSuccess({ user });
   } catch (error) {
+    console.error(error);
     return NextResponse.redirect(new URL(config.SITE_LOGIN_URL));
   }
 };
