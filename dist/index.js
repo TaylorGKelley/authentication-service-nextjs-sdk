@@ -85,21 +85,16 @@ var config = {
 };
 var config_default = config;
 
+// src/utils/getPermissions.ts
+var import_react = require("react");
+
 // src/utils/getCSRFToken.ts
 var import_headers = require("next/headers");
 var getCSRFToken = () => __async(null, null, function* () {
   var _a;
   try {
     const cookieStore = yield (0, import_headers.cookies)();
-    let csrfToken = (_a = cookieStore.get("csrfToken")) == null ? void 0 : _a.value;
-    if (!csrfToken) {
-      const response = yield fetch(`${config_default.SITE_URL}/api/auth/csrf`, {
-        method: "get"
-      });
-      const body = yield response.json();
-      if (!body.success) throw new Error(body.error);
-      csrfToken = body.data.csrfToken;
-    }
+    const csrfToken = (_a = cookieStore.get("csrfToken")) == null ? void 0 : _a.value;
     return csrfToken;
   } catch (error) {
     return null;
@@ -115,12 +110,103 @@ function isExpiredToken(token) {
 }
 
 // src/utils/refreshTokens.ts
+var import_headers2 = require("next/headers");
+
+// src/utils/parseCookie.ts
+var parseCookie = (name, cookieHeader) => {
+  if (!cookieHeader || cookieHeader.length === 0) return {};
+  const cookie = cookieHeader.find((cookie2) => cookie2.startsWith(name));
+  if (!cookie) return {};
+  const pairs = cookie.split(";");
+  const [key, value] = pairs[0].split("=");
+  const splittedPairs = pairs.slice(1).map((cookie2) => cookie2.split("="));
+  const cookieObj = Object.fromEntries(
+    splittedPairs.reduce(
+      (obj, pair) => {
+        var _a, _b, _c, _d;
+        obj.set(
+          decodeURIComponent((_a = pair[0]) == null ? void 0 : _a.trim()),
+          decodeURIComponent((_b = pair[1]) == null ? void 0 : _b.trim())
+        );
+        const [key2, value2] = [(_c = pair[0]) == null ? void 0 : _c.trim(), (_d = pair[1]) == null ? void 0 : _d.trim()];
+        switch (key2) {
+          case "Secure":
+          case "HttpOnly":
+            obj.set(key2, Boolean(value2));
+            break;
+          case "SameSite":
+            obj.set(key2, value2);
+            break;
+          case "Domain":
+          case "Path":
+            obj.set(key2, value2);
+            break;
+          case "Expires":
+            obj.set(key2, new Date(value2));
+            break;
+          case "Max-Age":
+            obj.set(key2, parseInt(value2));
+            break;
+        }
+        return obj;
+      },
+      /* @__PURE__ */ new Map()
+    )
+  );
+  cookieObj.Name = key;
+  cookieObj.Value = value;
+  console.log(cookieObj);
+  return cookieObj;
+};
+
+// src/utils/refreshTokens.ts
 var refreshTokens = () => __async(null, null, function* () {
-  const response = yield fetch(config_default.SITE_URL + "/api/auth/refresh", {
-    method: "get"
-  });
+  var _a;
+  const cookieStore = yield (0, import_headers2.cookies)();
+  let csrfToken = yield getCSRFToken();
+  if (!csrfToken) {
+    const csrfResponse = yield fetch(
+      config_default.AUTH_SERVICE_HOST_URL + "/api/v1/refresh-token",
+      {
+        method: "get"
+      }
+    ).then((r) => r.json());
+    cookieStore.set("csrfToken", csrfResponse.csrfToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/"
+    });
+    csrfToken = csrfResponse.csrfToken;
+  }
+  const response = yield fetch(
+    config_default.AUTH_SERVICE_HOST_URL + "/api/v1/refresh-token",
+    {
+      method: "post",
+      headers: {
+        "X-CSRF-Token": csrfToken
+      }
+    }
+  );
   if (response.status == 200 || response.status == 201) {
     const resData = yield response.json();
+    const { accessToken } = yield response.json();
+    const refreshCookie = parseCookie(
+      "refreshToken",
+      response.headers.getSetCookie()
+    );
+    cookieStore.set("accessToken", accessToken, {
+      expires: Date.now() + 15 * 60 * 1e3,
+      // 15 minutes
+      httpOnly: true,
+      path: "/",
+      sameSite: "lax"
+    });
+    cookieStore.set("refreshToken", refreshCookie.Value, {
+      httpOnly: refreshCookie.HttpOnly || true,
+      expires: refreshCookie.Expires,
+      path: (_a = refreshCookie.Path) != null ? _a : "/",
+      sameSite: refreshCookie.SameSite || "lax"
+    });
     if (!resData.success) {
       throw new Error(resData.error);
     } else {
@@ -133,12 +219,12 @@ var refreshTokens = () => __async(null, null, function* () {
 var refreshTokens_default = refreshTokens;
 
 // src/apiClient/index.ts
-var import_headers2 = require("next/headers");
+var import_headers3 = require("next/headers");
 function fetchWithAuth(input, init) {
   return __async(this, null, function* () {
     var _a;
     try {
-      const cookieStore = yield (0, import_headers2.cookies)();
+      const cookieStore = yield (0, import_headers3.cookies)();
       let accessToken = (_a = cookieStore.get("accessToken")) == null ? void 0 : _a.value;
       const csrfToken = yield getCSRFToken();
       let response = void 0;
@@ -180,8 +266,8 @@ function fetchWithAuth(input, init) {
   });
 }
 
-// src/utils/fetchPermissions.ts
-var fetchPermissions = () => __async(null, null, function* () {
+// src/utils/getPermissions.ts
+var getPermissions = (0, import_react.cache)(() => __async(null, null, function* () {
   try {
     const response = yield fetchWithAuth(
       `${config_default.AUTH_SERVICE_HOST_URL}/api/v1/user-permissions/${config_default.AUTH_SERVICE_CONNECTED_SERVICE_ID}`,
@@ -194,8 +280,8 @@ var fetchPermissions = () => __async(null, null, function* () {
   } catch (error) {
     throw error;
   }
-});
-var fetchPermissions_default = fetchPermissions;
+}));
+var getPermissions_default = getPermissions;
 
 // src/middleware/index.ts
 var import_server = require("next/server");
@@ -212,9 +298,9 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
       return import_server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
     if (accessToken && isExpiredToken(accessToken)) {
-      accessToken = (yield refreshTokens_default()).accessToken;
+      yield refreshTokens_default();
     }
-    const { user, permissions } = yield fetchPermissions_default();
+    const { user, permissions } = yield getPermissions_default();
     if (!user) {
       return import_server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
@@ -333,7 +419,7 @@ var logout_default = { routeId: routeId3, routeHandler: routeHandler3 };
 var import_server5 = require("next/server");
 var routeId4 = "initialize";
 var routeHandler4 = (req) => __async(null, null, function* () {
-  const data = yield fetchPermissions_default();
+  const data = yield getPermissions_default();
   return import_server5.NextResponse.json({
     success: true,
     data
@@ -385,11 +471,11 @@ var routeHandler5 = (_req) => __async(null, null, function* () {
 var csrf_default = { routeId: routeId5, routeHandler: routeHandler5 };
 
 // src/handler/login.ts
-var import_headers3 = require("next/headers");
+var import_headers4 = require("next/headers");
 var import_server7 = require("next/server");
 var routeId6 = "login";
 var routeHandler6 = (req) => __async(null, null, function* () {
-  const cookieStore = yield (0, import_headers3.cookies)();
+  const cookieStore = yield (0, import_headers4.cookies)();
   cookieStore.set("test", "test", {
     httpOnly: true,
     path: "/",

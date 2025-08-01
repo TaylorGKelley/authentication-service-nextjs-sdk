@@ -1,14 +1,13 @@
 import config from '@/config';
 import type AuthMiddlewareConfig from '@/types/AuthMiddlewareConfig';
 import type User from '@/types/User';
-import fetchPermissions from '@/utils/fetchPermissions';
+import getPermissions from '@/utils/getPermissions';
 import { isExpiredToken } from '@/utils/isExpiredToken';
 import refreshTokens from '@/utils/refreshTokens';
 import type { NextMiddlewareResult } from 'next/dist/server/web/types';
 import {
   NextResponse,
   type NextFetchEvent,
-  type NextMiddleware,
   type NextRequest,
 } from 'next/server';
 
@@ -33,11 +32,10 @@ const authMiddleware = async (
     }
 
     if (accessToken && isExpiredToken(accessToken)) {
-      // refresh token
-      accessToken = (await refreshTokens()).accessToken;
+      await refreshTokens();
     }
 
-    const { user, permissions } = await fetchPermissions();
+    const { user, permissions } = await getPermissions();
 
     if (!user) {
       return NextResponse.redirect(new URL(config.SITE_LOGIN_URL));

@@ -1,6 +1,6 @@
 import InitializeResponse from '@/types/Responses/InitializeResponse';
 import type RouteHandler from '@/types/RouteHandler';
-import fetchPermissions from '@/utils/fetchPermissions';
+import fetchPermissions from '@/utils/getPermissions';
 import { NextResponse } from 'next/server';
 
 const routeId = 'initialize';

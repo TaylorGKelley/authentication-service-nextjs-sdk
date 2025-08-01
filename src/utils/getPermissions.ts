@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import fetchWithAuth from '@/apiClient';
 import config from '@/config';
 import User from '@/types/User';
@@ -7,7 +8,7 @@ type PermissionResponse = {
   permissions: string[];
 };
 
-const fetchPermissions = async () => {
+const getPermissions = cache(async () => {
   try {
     const response = await fetchWithAuth<PermissionResponse>(
       `${config.AUTH_SERVICE_HOST_URL}/api/v1/user-permissions/${config.AUTH_SERVICE_CONNECTED_SERVICE_ID}`,
@@ -22,6 +23,6 @@ const fetchPermissions = async () => {
   } catch (error) {
     throw error;
   }
-};
+});
 
-export default fetchPermissions;
+export default getPermissions;
