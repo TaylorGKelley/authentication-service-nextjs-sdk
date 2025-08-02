@@ -117,7 +117,7 @@ import jwt from "jsonwebtoken";
 function isExpiredToken(token) {
   const { exp } = jwt.decode(token);
   const expirationTime = exp * 1e3;
-  return expirationTime < Date.now();
+  return expirationTime < Date.now() - 2 * 60 * 1e3;
 }
 
 // src/utils/refreshTokens.ts
@@ -249,7 +249,7 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
   var _a, _b;
   try {
     const url = req.nextUrl.clone();
-    if (Object.keys(options.protectedPaths).includes(url.pathname)) {
+    if (!Object.keys(options.protectedPaths).includes(url.pathname)) {
       return yield onSuccess({ user: null });
     }
     const refreshToken = (_a = req.cookies.get("refreshToken")) == null ? void 0 : _a.value;

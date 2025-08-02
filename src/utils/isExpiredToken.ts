@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
 
 export function isExpiredToken(token: string) {
-  const { exp } = jwt.decode(token) as { exp: number };
+	const { exp } = jwt.decode(token) as { exp: number };
 
-  const expirationTime = exp * 1000; // Convert to Milliseconds and Date
+	const expirationTime = exp * 1000; // Convert to Milliseconds and Date
 
-  return expirationTime < Date.now();
+	return expirationTime < Date.now() - 2 * 60 * 1000; // 2 minutes buffer
 }
