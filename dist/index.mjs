@@ -177,7 +177,7 @@ var refreshTokens = () => __async(null, null, function* () {
   let csrfToken = yield getCSRFToken();
   if (!csrfToken) {
     const csrfResponse = yield fetch(
-      config_default.AUTH_SERVICE_HOST_URL + "/api/v1/refresh-token",
+      config_default.AUTH_SERVICE_HOST_URL + "/api/v1/csrf-token",
       {
         method: "get"
       }
@@ -189,12 +189,13 @@ var refreshTokens = () => __async(null, null, function* () {
     );
     cookieStore.set("_csrf", xsrfCookie.Value, {
       httpOnly: xsrfCookie.HttpOnly || true,
-      expires: xsrfCookie.Expires,
+      // expires: undefined, // cookie will expire at end of browser session
       path: (_a = xsrfCookie.Path) != null ? _a : "/",
       sameSite: xsrfCookie.SameSite || "lax"
     });
     cookieStore.set("csrfToken", newCSRFToken, {
       httpOnly: true,
+      // expires: undefined, // cookie will expire at end of browser session
       sameSite: "lax",
       path: "/"
     });
@@ -209,7 +210,6 @@ var refreshTokens = () => __async(null, null, function* () {
       }
     }
   );
-  console.log(response.status, yield response.json());
   if (response.status == 200 || response.status == 201) {
     const resData = yield response.json();
     const { accessToken } = yield response.json();
