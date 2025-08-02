@@ -104,7 +104,7 @@ var getCSRFToken = () => __async(null, null, function* () {
 var import_headers2 = require("next/headers");
 function fetchWithAuth(input, init) {
   return __async(this, null, function* () {
-    var _a;
+    var _a, _b;
     try {
       const cookieStore = yield (0, import_headers2.cookies)();
       let accessToken = (_a = cookieStore.get("accessToken")) == null ? void 0 : _a.value;
@@ -112,7 +112,8 @@ function fetchWithAuth(input, init) {
       const response = yield fetch(input, __spreadProps(__spreadValues({}, init), {
         headers: __spreadProps(__spreadValues({}, init == null ? void 0 : init.headers), {
           Authorization: `Bearer ${accessToken}`,
-          "X-CSRF-Token": csrfToken || ""
+          "X-CSRF-Token": csrfToken || "",
+          cookie: `_csrf=${(_b = cookieStore.get("_csrf")) == null ? void 0 : _b.value};`
         })
       }));
       const data = yield response.json();
