@@ -56,9 +56,9 @@ const refreshTokens = async () => {
 	);
 
 	if (response.status == 200 || response.status == 201) {
-		const resData = (await response.json()) as RefreshResponse;
+		const refreshResponse = (await response.json()) as { accessToken: string };
 
-		const { accessToken } = (await response.json()) as { accessToken: string };
+		const { accessToken } = refreshResponse;
 		const refreshCookie = parseCookie(
 			'refreshToken',
 			response.headers.getSetCookie()
@@ -77,11 +77,7 @@ const refreshTokens = async () => {
 			sameSite: refreshCookie.SameSite || 'lax',
 		});
 
-		if (!resData.success) {
-			throw new Error(resData.error);
-		} else {
-			return resData.data;
-		}
+		return refreshResponse;
 	} else {
 		throw new Error('Failed to refresh token');
 	}

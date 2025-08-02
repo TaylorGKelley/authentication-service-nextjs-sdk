@@ -212,8 +212,8 @@ var refreshTokens = () => __async(null, null, function* () {
     }
   );
   if (response.status == 200 || response.status == 201) {
-    const resData = yield response.json();
-    const { accessToken } = yield response.json();
+    const refreshResponse = yield response.json();
+    const { accessToken } = refreshResponse;
     const refreshCookie = parseCookie(
       "refreshToken",
       response.headers.getSetCookie()
@@ -231,11 +231,7 @@ var refreshTokens = () => __async(null, null, function* () {
       path: (_d = refreshCookie.Path) != null ? _d : "/",
       sameSite: refreshCookie.SameSite || "lax"
     });
-    if (!resData.success) {
-      throw new Error(resData.error);
-    } else {
-      return resData.data;
-    }
+    return refreshResponse;
   } else {
     throw new Error("Failed to refresh token");
   }
