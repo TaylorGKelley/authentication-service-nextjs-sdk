@@ -48,6 +48,9 @@ const refreshTokens = async () => {
 			method: 'post',
 			headers: {
 				'X-CSRF-Token': csrfToken!,
+				cookie: `refreshToken=${
+					cookieStore.get('refreshToken')?.value
+				}; _csrf=${cookieStore.get('_csrf')?.value}`,
 			},
 		}
 	);

@@ -206,7 +206,7 @@ var parseCookie = (name, cookieHeader) => {
 
 // src/utils/refreshTokens.ts
 var refreshTokens = () => __async(null, null, function* () {
-  var _a, _b;
+  var _a, _b, _c, _d;
   const cookieStore = yield (0, import_headers3.cookies)();
   let csrfToken = yield getCSRFToken();
   if (!csrfToken) {
@@ -240,7 +240,8 @@ var refreshTokens = () => __async(null, null, function* () {
     {
       method: "post",
       headers: {
-        "X-CSRF-Token": csrfToken
+        "X-CSRF-Token": csrfToken,
+        cookie: `refreshToken=${(_b = cookieStore.get("refreshToken")) == null ? void 0 : _b.value}; _csrf=${(_c = cookieStore.get("_csrf")) == null ? void 0 : _c.value}`
       }
     }
   );
@@ -261,7 +262,7 @@ var refreshTokens = () => __async(null, null, function* () {
     cookieStore.set("refreshToken", refreshCookie.Value, {
       httpOnly: refreshCookie.HttpOnly || true,
       expires: refreshCookie.Expires,
-      path: (_b = refreshCookie.Path) != null ? _b : "/",
+      path: (_d = refreshCookie.Path) != null ? _d : "/",
       sameSite: refreshCookie.SameSite || "lax"
     });
     if (!resData.success) {
