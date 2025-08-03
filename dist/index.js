@@ -1,79 +1,14 @@
-"use strict";
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __spreadValues = (a, b) => {
-  for (var prop in b || (b = {}))
-    if (__hasOwnProp.call(b, prop))
-      __defNormalProp(a, prop, b[prop]);
-  if (__getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(b)) {
-      if (__propIsEnum.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
-    }
-  return a;
-};
-var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var __async = (__this, __arguments, generator) => {
-  return new Promise((resolve, reject) => {
-    var fulfilled = (value) => {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var rejected = (value) => {
-      try {
-        step(generator.throw(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
-    step((generator = generator.apply(__this, __arguments)).next());
-  });
-};
+'use strict';
 
-// src/index.ts
-var index_exports = {};
-__export(index_exports, {
-  AuthProvider: () => AuthProvider,
-  fetchWithAuth: () => fetchWithAuth,
-  fetchWithAuthServerSide: () => fetchWithAuthServerSide,
-  useAuthContext: () => useAuthContext,
-  withAuth: () => withAuth
-});
-module.exports = __toCommonJS(index_exports);
+var React = require('react');
+var headers = require('next/headers');
+var jwt = require('jsonwebtoken');
+var server = require('next/server');
+
+function _interopDefault (e) { return e && e.__esModule ? e : { default: e }; }
+
+var React__default = /*#__PURE__*/_interopDefault(React);
+var jwt__default = /*#__PURE__*/_interopDefault(jwt);
 
 // src/config.ts
 var config = {
@@ -86,71 +21,62 @@ var config = {
   AUTH_PUBLIC_ROUTE_PERMISSION: process.env.AUTH_PUBLIC_ROUTE_PERMISSION || "default"
 };
 var config_default = config;
-
-// src/utils/getPermissions.ts
-var import_react = require("react");
-
-// src/utils/getToken.ts
-var import_headers = require("next/headers");
-function getToken(token) {
-  return __async(this, null, function* () {
-    var _a, _b, _c;
-    const headerStore = yield (0, import_headers.headers)();
-    const cookieStore = yield (0, import_headers.cookies)();
-    let tokenValue;
-    switch (token) {
-      case "accessToken": {
-        const isRefreshed = headerStore.get("x-token-refreshed") === "true";
-        tokenValue = isRefreshed ? headerStore.get("x-access-token") || "" : ((_a = cookieStore.get("accessToken")) == null ? void 0 : _a.value) || "";
-        break;
-      }
-      case "csrfToken": {
-        const isRefreshed = headerStore.get("x-csrf-refreshed") === "true";
-        tokenValue = isRefreshed ? headerStore.get("x-csrf-token") || "" : ((_b = cookieStore.get("csrfToken")) == null ? void 0 : _b.value) || "";
-        break;
-      }
-      case "_csrfCookie": {
-        const isRefreshed = headerStore.get("x-csrf-refreshed") === "true";
-        tokenValue = isRefreshed ? headerStore.get("x-xsrf-token") || "" : ((_c = cookieStore.get("_csrf")) == null ? void 0 : _c.value) || "";
-        break;
-      }
+async function getToken(token) {
+  const headerStore = await headers.headers();
+  const cookieStore = await headers.cookies();
+  let tokenValue;
+  switch (token) {
+    case "accessToken": {
+      const isRefreshed = headerStore.get("x-token-refreshed") === "true";
+      tokenValue = isRefreshed ? headerStore.get("x-access-token") || "" : cookieStore.get("accessToken")?.value || "";
+      break;
     }
-    return tokenValue;
-  });
+    case "csrfToken": {
+      const isRefreshed = headerStore.get("x-csrf-refreshed") === "true";
+      tokenValue = isRefreshed ? headerStore.get("x-csrf-token") || "" : cookieStore.get("csrfToken")?.value || "";
+      break;
+    }
+    case "_csrfCookie": {
+      const isRefreshed = headerStore.get("x-csrf-refreshed") === "true";
+      tokenValue = isRefreshed ? headerStore.get("x-xsrf-token") || "" : cookieStore.get("_csrf")?.value || "";
+      break;
+    }
+  }
+  return tokenValue;
 }
 var getToken_default = getToken;
 
 // src/apiClient/index.ts
-function fetchWithAuth(input, init) {
-  return __async(this, null, function* () {
-    try {
-      let accessToken = yield getToken_default("accessToken");
-      const csrfToken = yield getToken_default("csrfToken");
-      const response = yield fetch(input, __spreadProps(__spreadValues({}, init), {
-        headers: __spreadProps(__spreadValues({}, init == null ? void 0 : init.headers), {
-          Authorization: `Bearer ${accessToken}`,
-          "X-CSRF-Token": csrfToken,
-          cookie: `_csrf=${yield getToken_default("_csrfCookie")};`
-        })
-      }));
-      const data = yield response.json();
-      return {
-        success: true,
-        data
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message
-      };
-    }
-  });
+async function fetchWithAuth(input, init) {
+  try {
+    let accessToken = await getToken_default("accessToken");
+    const csrfToken = await getToken_default("csrfToken");
+    const response = await fetch(input, {
+      ...init,
+      headers: {
+        ...init?.headers,
+        Authorization: `Bearer ${accessToken}`,
+        "X-CSRF-Token": csrfToken,
+        cookie: `_csrf=${await getToken_default("_csrfCookie")};`
+      }
+    });
+    const data = await response.json();
+    return {
+      success: true,
+      data
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message
+    };
+  }
 }
 
 // src/utils/getPermissions.ts
-var getPermissions = (0, import_react.cache)(() => __async(null, null, function* () {
+var getPermissions = React.cache(async () => {
   try {
-    const response = yield fetchWithAuth(
+    const response = await fetchWithAuth(
       `${config_default.AUTH_SERVICE_HOST_URL}/api/v1/user-permissions/${config_default.AUTH_SERVICE_CONNECTED_SERVICE_ID}`,
       {
         method: "get"
@@ -161,32 +87,22 @@ var getPermissions = (0, import_react.cache)(() => __async(null, null, function*
   } catch (error) {
     throw error;
   }
-}));
+});
 var getPermissions_default = getPermissions;
-
-// src/utils/isExpiredToken.ts
-var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
 function isExpiredToken(token) {
-  const { exp } = import_jsonwebtoken.default.decode(token);
+  const { exp } = jwt__default.default.decode(token);
   const expirationTime = exp * 1e3;
   return expirationTime < Date.now() - 2 * 60 * 1e3;
 }
-
-// src/utils/getCSRFToken.ts
-var import_headers2 = require("next/headers");
-var getCSRFToken = () => __async(null, null, function* () {
-  var _a;
+var getCSRFToken = async () => {
   try {
-    const cookieStore = yield (0, import_headers2.cookies)();
-    const csrfToken = (_a = cookieStore.get("csrfToken")) == null ? void 0 : _a.value;
+    const cookieStore = await headers.cookies();
+    const csrfToken = cookieStore.get("csrfToken")?.value;
     return csrfToken;
   } catch (error) {
     return null;
   }
-});
-
-// src/utils/refreshTokens.ts
-var import_headers3 = require("next/headers");
+};
 
 // src/utils/parseCookie.ts
 var parseCookie = (name, cookieHeader) => {
@@ -199,12 +115,11 @@ var parseCookie = (name, cookieHeader) => {
   const cookieObj = Object.fromEntries(
     splittedPairs.reduce(
       (obj, pair) => {
-        var _a, _b, _c, _d;
         obj.set(
-          decodeURIComponent((_a = pair[0]) == null ? void 0 : _a.trim()),
-          decodeURIComponent((_b = pair[1]) == null ? void 0 : _b.trim())
+          decodeURIComponent(pair[0]?.trim()),
+          decodeURIComponent(pair[1]?.trim())
         );
-        const [key2, value2] = [(_c = pair[0]) == null ? void 0 : _c.trim(), (_d = pair[1]) == null ? void 0 : _d.trim()];
+        const [key2, value2] = [pair[0]?.trim(), pair[1]?.trim()];
         switch (key2) {
           case "Secure":
           case "HttpOnly":
@@ -236,19 +151,18 @@ var parseCookie = (name, cookieHeader) => {
 };
 
 // src/utils/refreshTokens.ts
-var refreshTokens = () => __async(null, null, function* () {
-  var _a, _b, _c, _d;
-  const cookieStore = yield (0, import_headers3.cookies)();
-  let csrfToken = yield getCSRFToken();
+var refreshTokens = async () => {
+  const cookieStore = await headers.cookies();
+  let csrfToken = await getCSRFToken();
   let newXSRFToken = void 0;
   if (!csrfToken) {
-    const csrfResponse = yield fetch(
+    const csrfResponse = await fetch(
       config_default.AUTH_SERVICE_HOST_URL + "/api/v1/csrf-token",
       {
         method: "get"
       }
     );
-    const { csrfToken: newCSRFToken } = yield csrfResponse.json();
+    const { csrfToken: newCSRFToken } = await csrfResponse.json();
     const xsrfCookie = parseCookie(
       "_csrf",
       csrfResponse.headers.getSetCookie()
@@ -256,7 +170,7 @@ var refreshTokens = () => __async(null, null, function* () {
     cookieStore.set("_csrf", xsrfCookie.Value, {
       httpOnly: xsrfCookie.HttpOnly || true,
       // expires: undefined, // cookie will expire at end of browser session
-      path: (_a = xsrfCookie.Path) != null ? _a : "/",
+      path: xsrfCookie.Path ?? "/",
       sameSite: xsrfCookie.SameSite || "lax"
     });
     cookieStore.set("csrfToken", newCSRFToken, {
@@ -268,18 +182,18 @@ var refreshTokens = () => __async(null, null, function* () {
     csrfToken = newCSRFToken;
     newXSRFToken = xsrfCookie.Value;
   }
-  const response = yield fetch(
+  const response = await fetch(
     config_default.AUTH_SERVICE_HOST_URL + "/api/v1/refresh-token",
     {
       method: "post",
       headers: {
         "X-CSRF-Token": csrfToken,
-        cookie: `refreshToken=${(_b = cookieStore.get("refreshToken")) == null ? void 0 : _b.value}; _csrf=${(_c = cookieStore.get("_csrf")) == null ? void 0 : _c.value}`
+        cookie: `refreshToken=${cookieStore.get("refreshToken")?.value}; _csrf=${cookieStore.get("_csrf")?.value}`
       }
     }
   );
   if (response.status == 200 || response.status == 201) {
-    const refreshResponse = yield response.json();
+    const refreshResponse = await response.json();
     const { accessToken } = refreshResponse;
     const refreshCookie = parseCookie(
       "refreshToken",
@@ -295,29 +209,25 @@ var refreshTokens = () => __async(null, null, function* () {
     cookieStore.set("refreshToken", refreshCookie.Value, {
       httpOnly: refreshCookie.HttpOnly || true,
       expires: refreshCookie.Expires,
-      path: (_d = refreshCookie.Path) != null ? _d : "/",
+      path: refreshCookie.Path ?? "/",
       sameSite: refreshCookie.SameSite || "lax"
     });
     return { accessToken, csrfToken, xsrfToken: newXSRFToken };
   } else {
     throw new Error("Failed to refresh token");
   }
-});
+};
 var refreshTokens_default = refreshTokens;
-
-// src/middleware/index.ts
-var import_server = require("next/server");
-var authMiddleware = (req, options, onSuccess) => __async(null, null, function* () {
-  var _a, _b;
+var authMiddleware = async (req, options, onSuccess) => {
   try {
     const url = req.nextUrl.clone();
     if (!Object.keys(options.protectedPaths).includes(url.pathname)) {
-      return yield onSuccess({ user: null });
+      return await onSuccess({ user: null });
     }
-    const refreshToken = (_a = req.cookies.get("refreshToken")) == null ? void 0 : _a.value;
-    let accessToken = (_b = req.cookies.get("accessToken")) == null ? void 0 : _b.value;
+    const refreshToken = req.cookies.get("refreshToken")?.value;
+    let accessToken = req.cookies.get("accessToken")?.value;
     if (!refreshToken) {
-      return import_server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
+      return server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
     let newAccessToken = void 0;
     let newCSRFToken = void 0;
@@ -328,23 +238,23 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
           accessToken: newAccessToken,
           csrfToken: newCSRFToken,
           xsrfToken: newXSRFToken
-        } = yield refreshTokens_default());
+        } = await refreshTokens_default());
       } catch (error) {
-        return import_server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
+        return server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
       }
     }
-    const { user, permissions } = yield getPermissions_default();
+    const { user, permissions } = await getPermissions_default();
     if (!user) {
-      return import_server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
+      return server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
     if (!options.protectedPaths[url.pathname].some(
       (permission) => permissions.includes(permission) || permission === config_default.AUTH_PUBLIC_ROUTE_PERMISSION
     )) {
-      return import_server.NextResponse.redirect(new URL(config_default.SITE_UNAUTHORIZED_URL));
+      return server.NextResponse.redirect(new URL(config_default.SITE_UNAUTHORIZED_URL));
     }
-    const res = yield onSuccess({ user });
+    const res = await onSuccess({ user });
     if (!newAccessToken) return res;
-    const finalResponse = import_server.NextResponse.next({
+    const finalResponse = server.NextResponse.next({
       request: {
         headers: new Headers(req.headers)
       }
@@ -360,63 +270,60 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
     return finalResponse;
   } catch (error) {
     console.error(error);
-    return import_server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
+    return server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
   }
-});
+};
 var withAuth = (middleware, options) => {
-  return (...args) => __async(null, null, function* () {
+  return async (...args) => {
     const req = args[0];
-    return yield authMiddleware(req, options, (_0) => __async(null, [_0], function* ({ user }) {
+    return await authMiddleware(req, options, async ({ user }) => {
       args[0].user = user;
-      return yield middleware(...args);
-    }));
-  });
+      return await middleware(...args);
+    });
+  };
 };
 
 // src/apiClient/server/index.ts
-function fetchWithAuthServerSide(input, init) {
-  return __async(this, null, function* () {
-    try {
-      let accessToken = yield getToken_default("accessToken");
-      let csrfToken = yield getToken_default("csrfToken");
-      let xsrfToken = yield getToken_default("_csrfCookie");
-      if (!accessToken || isExpiredToken(accessToken)) {
-        const newTokens = yield refreshTokens_default();
-        accessToken = newTokens.accessToken;
-        csrfToken = newTokens.csrfToken;
-        if (newTokens.xsrfToken) {
-          xsrfToken = newTokens.xsrfToken;
-        }
+async function fetchWithAuthServerSide(input, init) {
+  try {
+    let accessToken = await getToken_default("accessToken");
+    let csrfToken = await getToken_default("csrfToken");
+    let xsrfToken = await getToken_default("_csrfCookie");
+    if (!accessToken || isExpiredToken(accessToken)) {
+      const newTokens = await refreshTokens_default();
+      accessToken = newTokens.accessToken;
+      csrfToken = newTokens.csrfToken;
+      if (newTokens.xsrfToken) {
+        xsrfToken = newTokens.xsrfToken;
       }
-      const response = yield fetch(input, __spreadProps(__spreadValues({}, init), {
-        headers: __spreadProps(__spreadValues({}, init == null ? void 0 : init.headers), {
-          Authorization: `Bearer ${accessToken}`,
-          "X-CSRF-Token": csrfToken,
-          cookie: `_csrf=${xsrfToken};`
-        })
-      }));
-      const data = yield response.json();
-      return {
-        success: true,
-        data
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message
-      };
     }
-  });
+    const response = await fetch(input, {
+      ...init,
+      headers: {
+        ...init?.headers,
+        Authorization: `Bearer ${accessToken}`,
+        "X-CSRF-Token": csrfToken,
+        cookie: `_csrf=${xsrfToken};`
+      }
+    });
+    const data = await response.json();
+    return {
+      success: true,
+      data
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message
+    };
+  }
 }
-
-// src/providers/AuthProvider.tsx
-var import_react2 = __toESM(require("react"));
-var authContext = (0, import_react2.createContext)({
+var authContext = React.createContext({
   user: null,
   permissions: []
 });
 var useAuthContext = () => {
-  const context = (0, import_react2.useContext)(authContext);
+  const context = React.useContext(authContext);
   return context;
 };
 var AuthProvider = ({
@@ -424,13 +331,11 @@ var AuthProvider = ({
   permissions,
   children
 }) => {
-  return /* @__PURE__ */ import_react2.default.createElement(authContext.Provider, { value: { user, permissions } }, children);
+  return /* @__PURE__ */ React__default.default.createElement(authContext.Provider, { value: { user, permissions } }, children);
 };
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  AuthProvider,
-  fetchWithAuth,
-  fetchWithAuthServerSide,
-  useAuthContext,
-  withAuth
-});
+
+exports.AuthProvider = AuthProvider;
+exports.fetchWithAuth = fetchWithAuth;
+exports.fetchWithAuthServerSide = fetchWithAuthServerSide;
+exports.useAuthContext = useAuthContext;
+exports.withAuth = withAuth;
