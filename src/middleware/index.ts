@@ -5,11 +5,7 @@ import getPermissions from '@/utils/getPermissions';
 import { isExpiredToken } from '@/utils/isExpiredToken';
 import refreshTokens from '@/utils/refreshTokens';
 import type { NextMiddlewareResult } from 'next/dist/server/web/types';
-import {
-	NextResponse,
-	type NextFetchEvent,
-	type NextRequest,
-} from 'next/server';
+import { NextFetchEvent, NextResponse, type NextRequest } from 'next/server';
 
 const authMiddleware = async (
 	req: NextRequest,
@@ -31,9 +27,15 @@ const authMiddleware = async (
 			return NextResponse.redirect(new URL(config.SITE_LOGIN_URL));
 		}
 
+		let newAccessToken: string | undefined = undefined;
+		let newCSRFToken: string | undefined = undefined;
+		let newXSRFToken: string | undefined = undefined;
 		if (!accessToken || isExpiredToken(accessToken)) {
-			await refreshTokens();
-			console.log('refreshed tokens');
+			({
+				accessToken: newAccessToken,
+				csrfToken: newCSRFToken,
+				xsrfToken: newXSRFToken,
+			} = await refreshTokens());
 		}
 
 		const { user, permissions } = await getPermissions();
@@ -55,7 +57,25 @@ const authMiddleware = async (
 		}
 
 		// redirect to login
-		return await onSuccess({ user });
+		const res = await onSuccess({ user });
+
+		if (!newAccessToken) return res;
+
+		const finalResponse = NextResponse.next({
+			request: {
+				headers: new Headers(req.headers),
+			},
+		});
+		finalResponse.headers.set('x-access-token', newAccessToken);
+		finalResponse.headers.set('x-csrf-token', newCSRFToken || '');
+		finalResponse.headers.set('x-xsrf-token', newXSRFToken || '');
+		finalResponse.headers.set(
+			'x-csrf-refreshed',
+			String(newXSRFToken !== undefined)
+		);
+		finalResponse.headers.set('x-token-refreshed', 'true');
+
+		return finalResponse;
 	} catch (error) {
 		console.error(error);
 		return NextResponse.redirect(new URL(config.SITE_LOGIN_URL));

@@ -1,5 +1,4 @@
 import config from '@/config';
-import RefreshResponse from '@/types/Responses/RefreshResponse';
 import { getCSRFToken } from './getCSRFToken';
 import { cookies } from 'next/headers';
 import parseCookie from './parseCookie';
@@ -8,6 +7,7 @@ const refreshTokens = async () => {
 	const cookieStore = await cookies();
 
 	let csrfToken = await getCSRFToken();
+	let newXSRFToken: string | undefined = undefined;
 
 	if (!csrfToken) {
 		// fetch csrf token for this session
@@ -40,6 +40,7 @@ const refreshTokens = async () => {
 		});
 
 		csrfToken = newCSRFToken;
+		newXSRFToken = xsrfCookie.Value;
 	}
 
 	const response = await fetch(
@@ -77,7 +78,7 @@ const refreshTokens = async () => {
 			sameSite: refreshCookie.SameSite || 'lax',
 		});
 
-		return refreshResponse;
+		return { accessToken, csrfToken, xsrfToken: newXSRFToken };
 	} else {
 		throw new Error('Failed to refresh token');
 	}
