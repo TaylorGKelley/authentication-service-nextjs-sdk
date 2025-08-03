@@ -87,36 +87,47 @@ var config_default = config;
 // src/utils/getPermissions.ts
 var import_react = require("react");
 
-// src/utils/getCSRFToken.ts
+// src/utils/getToken.ts
 var import_headers = require("next/headers");
-var getCSRFToken = () => __async(null, null, function* () {
-  var _a;
-  try {
+function getToken(token) {
+  return __async(this, null, function* () {
+    var _a, _b, _c;
+    const headerStore = yield (0, import_headers.headers)();
     const cookieStore = yield (0, import_headers.cookies)();
-    const csrfToken = (_a = cookieStore.get("csrfToken")) == null ? void 0 : _a.value;
-    return csrfToken;
-  } catch (error) {
-    return null;
-  }
-});
+    let tokenValue;
+    switch (token) {
+      case "accessToken": {
+        const isRefreshed = headerStore.get("x-token-refreshed") === "true";
+        tokenValue = isRefreshed ? headerStore.get("x-access-token") || "" : ((_a = cookieStore.get("accessToken")) == null ? void 0 : _a.value) || "";
+        break;
+      }
+      case "csrfToken": {
+        const isRefreshed = headerStore.get("x-csrf-refreshed") === "true";
+        tokenValue = isRefreshed ? headerStore.get("x-csrf-token") || "" : ((_b = cookieStore.get("csrfToken")) == null ? void 0 : _b.value) || "";
+        break;
+      }
+      case "_csrfCookie": {
+        const isRefreshed = headerStore.get("x-csrf-refreshed") === "true";
+        tokenValue = isRefreshed ? headerStore.get("x-xsrf-token") || "" : ((_c = cookieStore.get("_csrf")) == null ? void 0 : _c.value) || "";
+        break;
+      }
+    }
+    return tokenValue;
+  });
+}
+var getToken_default = getToken;
 
 // src/apiClient/index.ts
-var import_headers2 = require("next/headers");
 function fetchWithAuth(input, init) {
   return __async(this, null, function* () {
-    var _a, _b;
     try {
-      const headerStore = yield (0, import_headers2.headers)();
-      const isRefreshed = headerStore.get("x-token-refreshed") === "true";
-      const isCSRFRefreshed = headerStore.get("x-csrf-refreshed") === "true";
-      const cookieStore = yield (0, import_headers2.cookies)();
-      let accessToken = isRefreshed ? headerStore.get("x-access-token") : (_a = cookieStore.get("accessToken")) == null ? void 0 : _a.value;
-      const csrfToken = isCSRFRefreshed ? headerStore.get("x-csrf-token") : yield getCSRFToken();
+      let accessToken = yield getToken_default("accessToken");
+      const csrfToken = yield getToken_default("csrfToken");
       const response = yield fetch(input, __spreadProps(__spreadValues({}, init), {
         headers: __spreadProps(__spreadValues({}, init == null ? void 0 : init.headers), {
           Authorization: `Bearer ${accessToken}`,
-          "X-CSRF-Token": csrfToken || "",
-          cookie: `_csrf=${isCSRFRefreshed ? headerStore.get("x-xsrf-token") : (_b = cookieStore.get("_csrf")) == null ? void 0 : _b.value};`
+          "X-CSRF-Token": csrfToken,
+          cookie: `_csrf=${yield getToken_default("_csrfCookie")};`
         })
       }));
       const data = yield response.json();
@@ -157,6 +168,19 @@ function isExpiredToken(token) {
   const expirationTime = exp * 1e3;
   return expirationTime < Date.now() - 2 * 60 * 1e3;
 }
+
+// src/utils/getCSRFToken.ts
+var import_headers2 = require("next/headers");
+var getCSRFToken = () => __async(null, null, function* () {
+  var _a;
+  try {
+    const cookieStore = yield (0, import_headers2.cookies)();
+    const csrfToken = (_a = cookieStore.get("csrfToken")) == null ? void 0 : _a.value;
+    return csrfToken;
+  } catch (error) {
+    return null;
+  }
+});
 
 // src/utils/refreshTokens.ts
 var import_headers3 = require("next/headers");

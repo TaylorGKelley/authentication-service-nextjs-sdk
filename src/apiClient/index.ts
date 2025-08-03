@@ -1,4 +1,5 @@
 import { getCSRFToken } from '@/utils/getCSRFToken';
+import getToken from '@/utils/getToken';
 import { cookies, headers } from 'next/headers';
 
 export type Response<T> = DataResponse<T> | ErrorResponse;
@@ -18,29 +19,16 @@ export default async function fetchWithAuth<T = any>(
 	init?: RequestInit
 ): Promise<Response<T>> {
 	try {
-		const headerStore = await headers();
-		const isRefreshed = headerStore.get('x-token-refreshed') === 'true';
-		const isCSRFRefreshed = headerStore.get('x-csrf-refreshed') === 'true';
-
-		const cookieStore = await cookies();
-		let accessToken = isRefreshed
-			? headerStore.get('x-access-token')!
-			: cookieStore.get('accessToken')?.value;
-		const csrfToken = isCSRFRefreshed
-			? headerStore.get('x-csrf-token')
-			: await getCSRFToken();
+		let accessToken = await getToken('accessToken');
+		const csrfToken = await getToken('csrfToken');
 
 		const response = await fetch(input, {
 			...init,
 			headers: {
 				...init?.headers,
 				Authorization: `Bearer ${accessToken}`,
-				'X-CSRF-Token': csrfToken || '',
-				cookie: `_csrf=${
-					isCSRFRefreshed
-						? headerStore.get('x-xsrf-token')
-						: cookieStore.get('_csrf')?.value
-				};`,
+				'X-CSRF-Token': csrfToken,
+				cookie: `_csrf=${await getToken('_csrfCookie')};`,
 			},
 		});
 
