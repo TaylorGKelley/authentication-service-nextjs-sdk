@@ -57,11 +57,12 @@ type ErrorResponse = {
  */
 declare function fetchWithAuthServerSide<T = any>(input: string | URL | globalThis.Request, init?: RequestInit): Promise<Response<T>>;
 
-type AuthProviderProps = PropsWithChildren & {
+type AuthContext = {
     user: User | null;
     permissions: string[];
 };
-type AuthContext = {
+
+type AuthProviderProps = PropsWithChildren & {
     user: User | null;
     permissions: string[];
 };

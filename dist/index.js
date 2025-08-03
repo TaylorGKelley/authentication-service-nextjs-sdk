@@ -318,10 +318,12 @@ async function fetchWithAuthServerSide(input, init) {
     };
   }
 }
-var authContext = React.createContext({
+var authContext = React__default.default.createContext({
   user: null,
   permissions: []
 });
+
+// src/providers/AuthProvider.tsx
 var useAuthContext = () => {
   const context = React.useContext(authContext);
   return context;

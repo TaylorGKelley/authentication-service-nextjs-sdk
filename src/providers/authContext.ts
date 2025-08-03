@@ -1,5 +1,6 @@
 'use client';
 
+import type User from '@/types/User';
 import React from 'react';
 
 type AuthContext = {

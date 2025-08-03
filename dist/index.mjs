@@ -1,4 +1,4 @@
-import React, { cache, createContext, useContext } from 'react';
+import React, { cache, useContext } from 'react';
 import { headers, cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
@@ -311,10 +311,12 @@ async function fetchWithAuthServerSide(input, init) {
     };
   }
 }
-var authContext = createContext({
+var authContext = React.createContext({
   user: null,
   permissions: []
 });
+
+// src/providers/AuthProvider.tsx
 var useAuthContext = () => {
   const context = useContext(authContext);
   return context;
