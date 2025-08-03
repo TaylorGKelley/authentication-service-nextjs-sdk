@@ -249,7 +249,7 @@ var refreshTokens = () => __async(null, null, function* () {
       response.headers.getSetCookie()
     );
     cookieStore.set("accessToken", accessToken, {
-      expires: Date.now() + 15 * 60 * 1e3,
+      expires: new Date(Date.now() + 15 * 60 * 1e3),
       // 15 minutes
       httpOnly: true,
       path: "/",
