@@ -66,8 +66,8 @@ const refreshTokens = async () => {
 		);
 
 		cookieStore.set('accessToken', accessToken, {
-			expires: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
 			httpOnly: true,
+			expires: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
 			path: '/',
 			sameSite: 'lax',
 		});

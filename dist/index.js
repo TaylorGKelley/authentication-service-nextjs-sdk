@@ -283,9 +283,9 @@ var refreshTokens = () => __async(null, null, function* () {
       response.headers.getSetCookie()
     );
     cookieStore.set("accessToken", accessToken, {
+      httpOnly: true,
       expires: new Date(Date.now() + 15 * 60 * 1e3),
       // 15 minutes
-      httpOnly: true,
       path: "/",
       sameSite: "lax"
     });
@@ -320,11 +320,15 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
     let newCSRFToken = void 0;
     let newXSRFToken = void 0;
     if (!accessToken || isExpiredToken(accessToken)) {
-      ({
-        accessToken: newAccessToken,
-        csrfToken: newCSRFToken,
-        xsrfToken: newXSRFToken
-      } = yield refreshTokens_default());
+      try {
+        ({
+          accessToken: newAccessToken,
+          csrfToken: newCSRFToken,
+          xsrfToken: newXSRFToken
+        } = yield refreshTokens_default());
+      } catch (error) {
+        return import_server.NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
+      }
     }
     const { user, permissions } = yield getPermissions_default();
     if (!user) {

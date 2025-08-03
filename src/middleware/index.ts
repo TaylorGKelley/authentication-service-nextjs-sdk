@@ -31,11 +31,15 @@ const authMiddleware = async (
 		let newCSRFToken: string | undefined = undefined;
 		let newXSRFToken: string | undefined = undefined;
 		if (!accessToken || isExpiredToken(accessToken)) {
-			({
-				accessToken: newAccessToken,
-				csrfToken: newCSRFToken,
-				xsrfToken: newXSRFToken,
-			} = await refreshTokens());
+			try {
+				({
+					accessToken: newAccessToken,
+					csrfToken: newCSRFToken,
+					xsrfToken: newXSRFToken,
+				} = await refreshTokens());
+			} catch (error) {
+				return NextResponse.redirect(new URL(config.SITE_LOGIN_URL));
+			}
 		}
 
 		const { user, permissions } = await getPermissions();
