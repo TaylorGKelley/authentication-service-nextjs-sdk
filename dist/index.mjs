@@ -67,19 +67,22 @@ var getCSRFToken = () => __async(null, null, function* () {
 });
 
 // src/apiClient/index.ts
-import { cookies as cookies2 } from "next/headers";
+import { cookies as cookies2, headers } from "next/headers";
 function fetchWithAuth(input, init) {
   return __async(this, null, function* () {
     var _a, _b;
     try {
+      const headerStore = yield headers();
+      const isRefreshed = headerStore.get("x-token-refreshed") === "true";
+      const isCSRFRefreshed = headerStore.get("x-csrf-refreshed") === "true";
       const cookieStore = yield cookies2();
-      let accessToken = (_a = cookieStore.get("accessToken")) == null ? void 0 : _a.value;
-      const csrfToken = yield getCSRFToken();
+      let accessToken = isRefreshed ? headerStore.get("x-access-token") : (_a = cookieStore.get("accessToken")) == null ? void 0 : _a.value;
+      const csrfToken = isCSRFRefreshed ? headerStore.get("x-csrf-token") : yield getCSRFToken();
       const response = yield fetch(input, __spreadProps(__spreadValues({}, init), {
         headers: __spreadProps(__spreadValues({}, init == null ? void 0 : init.headers), {
           Authorization: `Bearer ${accessToken}`,
           "X-CSRF-Token": csrfToken || "",
-          cookie: `_csrf=${(_b = cookieStore.get("_csrf")) == null ? void 0 : _b.value};`
+          cookie: `_csrf=${isCSRFRefreshed ? headerStore.get("x-xsrf-token") : (_b = cookieStore.get("_csrf")) == null ? void 0 : _b.value};`
         })
       }));
       const data = yield response.json();
@@ -176,6 +179,7 @@ var refreshTokens = () => __async(null, null, function* () {
   var _a, _b, _c, _d;
   const cookieStore = yield cookies3();
   let csrfToken = yield getCSRFToken();
+  let newXSRFToken = void 0;
   if (!csrfToken) {
     const csrfResponse = yield fetch(
       config_default.AUTH_SERVICE_HOST_URL + "/api/v1/csrf-token",
@@ -201,6 +205,7 @@ var refreshTokens = () => __async(null, null, function* () {
       path: "/"
     });
     csrfToken = newCSRFToken;
+    newXSRFToken = xsrfCookie.Value;
   }
   const response = yield fetch(
     config_default.AUTH_SERVICE_HOST_URL + "/api/v1/refresh-token",
@@ -232,7 +237,7 @@ var refreshTokens = () => __async(null, null, function* () {
       path: (_d = refreshCookie.Path) != null ? _d : "/",
       sameSite: refreshCookie.SameSite || "lax"
     });
-    return refreshResponse;
+    return { accessToken, csrfToken, xsrfToken: newXSRFToken };
   } else {
     throw new Error("Failed to refresh token");
   }
@@ -240,9 +245,7 @@ var refreshTokens = () => __async(null, null, function* () {
 var refreshTokens_default = refreshTokens;
 
 // src/middleware/index.ts
-import {
-  NextResponse
-} from "next/server";
+import { NextResponse } from "next/server";
 var authMiddleware = (req, options, onSuccess) => __async(null, null, function* () {
   var _a, _b;
   try {
@@ -255,9 +258,15 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
     if (!refreshToken) {
       return NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
     }
+    let newAccessToken = void 0;
+    let newCSRFToken = void 0;
+    let newXSRFToken = void 0;
     if (!accessToken || isExpiredToken(accessToken)) {
-      yield refreshTokens_default();
-      console.log("refreshed tokens");
+      ({
+        accessToken: newAccessToken,
+        csrfToken: newCSRFToken,
+        xsrfToken: newXSRFToken
+      } = yield refreshTokens_default());
     }
     const { user, permissions } = yield getPermissions_default();
     if (!user) {
@@ -268,7 +277,22 @@ var authMiddleware = (req, options, onSuccess) => __async(null, null, function* 
     )) {
       return NextResponse.redirect(new URL(config_default.SITE_UNAUTHORIZED_URL));
     }
-    return yield onSuccess({ user });
+    const res = yield onSuccess({ user });
+    if (!newAccessToken) return res;
+    const finalResponse = NextResponse.next({
+      request: {
+        headers: new Headers(req.headers)
+      }
+    });
+    finalResponse.headers.set("x-access-token", newAccessToken);
+    finalResponse.headers.set("x-csrf-token", newCSRFToken || "");
+    finalResponse.headers.set("x-xsrf-token", newXSRFToken || "");
+    finalResponse.headers.set(
+      "x-csrf-refreshed",
+      String(newXSRFToken !== void 0)
+    );
+    finalResponse.headers.set("x-token-refreshed", "true");
+    return finalResponse;
   } catch (error) {
     console.error(error);
     return NextResponse.redirect(new URL(config_default.SITE_LOGIN_URL));
