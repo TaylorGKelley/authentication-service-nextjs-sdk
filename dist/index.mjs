@@ -371,8 +371,31 @@ function fetchWithAuthServerSide(input, init) {
     }
   });
 }
+
+// src/providers/AuthProvider.tsx
+import React, {
+  createContext,
+  useContext
+} from "react";
+var authContext = createContext({
+  user: null,
+  permissions: []
+});
+var useAuthContext = () => {
+  const context = useContext(authContext);
+  return context;
+};
+var AuthProvider = ({
+  user,
+  permissions,
+  children
+}) => {
+  return /* @__PURE__ */ React.createElement(authContext.Provider, { value: { user, permissions } }, children);
+};
 export {
+  AuthProvider,
   fetchWithAuth,
   fetchWithAuthServerSide,
+  useAuthContext,
   withAuth
 };

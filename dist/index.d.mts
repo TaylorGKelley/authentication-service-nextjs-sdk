@@ -1,5 +1,6 @@
 import { NextMiddlewareResult } from 'next/dist/server/web/types';
 import { NextRequest, NextFetchEvent } from 'next/server';
+import React, { PropsWithChildren } from 'react';
 
 type User = {
     id: number;
@@ -56,4 +57,15 @@ type ErrorResponse = {
  */
 declare function fetchWithAuthServerSide<T = any>(input: string | URL | globalThis.Request, init?: RequestInit): Promise<Response<T>>;
 
-export { type AuthMiddlewareConfig, type User, fetchWithAuth, fetchWithAuthServerSide, withAuth };
+type AuthProviderProps = PropsWithChildren & {
+    user: User | null;
+    permissions: string[];
+};
+type AuthContext = {
+    user: User | null;
+    permissions: string[];
+};
+declare const useAuthContext: () => AuthContext;
+declare const AuthProvider: ({ user, permissions, children, }: AuthProviderProps) => React.JSX.Element;
+
+export { type AuthMiddlewareConfig, AuthProvider, type User, fetchWithAuth, fetchWithAuthServerSide, useAuthContext, withAuth };

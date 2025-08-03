@@ -67,8 +67,10 @@ var __async = (__this, __arguments, generator) => {
 // src/index.ts
 var index_exports = {};
 __export(index_exports, {
+  AuthProvider: () => AuthProvider,
   fetchWithAuth: () => fetchWithAuth,
   fetchWithAuthServerSide: () => fetchWithAuthServerSide,
+  useAuthContext: () => useAuthContext,
   withAuth: () => withAuth
 });
 module.exports = __toCommonJS(index_exports);
@@ -406,9 +408,29 @@ function fetchWithAuthServerSide(input, init) {
     }
   });
 }
+
+// src/providers/AuthProvider.tsx
+var import_react2 = __toESM(require("react"));
+var authContext = (0, import_react2.createContext)({
+  user: null,
+  permissions: []
+});
+var useAuthContext = () => {
+  const context = (0, import_react2.useContext)(authContext);
+  return context;
+};
+var AuthProvider = ({
+  user,
+  permissions,
+  children
+}) => {
+  return /* @__PURE__ */ import_react2.default.createElement(authContext.Provider, { value: { user, permissions } }, children);
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  AuthProvider,
   fetchWithAuth,
   fetchWithAuthServerSide,
+  useAuthContext,
   withAuth
 });
