@@ -18,6 +18,24 @@ declare const withAuth: (middleware: (request: NextRequest & {
     user: User | null;
 }, event: NextFetchEvent]) => Promise<NextMiddlewareResult>;
 
+type Response$1<T> = DataResponse$1<T> | ErrorResponse$1;
+type DataResponse$1<T> = {
+    success: true;
+    data: T;
+};
+type ErrorResponse$1 = {
+    success: false;
+    message: string;
+};
+/**
+ *
+ * @param input The input can be a string, URL, or Request object. Meant to be the URL of the API endpoint.
+ * @param init Any request options such as method, headers, body, etc.
+ * @template T The type of the response body. Defaults to any.
+ * @returns
+ */
+declare function fetchWithAuth<T = any>(input: string | URL | globalThis.Request, init?: RequestInit): Promise<Response$1<T>>;
+
 type Response<T> = DataResponse<T> | ErrorResponse;
 type DataResponse<T> = {
     success: true;
@@ -27,6 +45,15 @@ type ErrorResponse = {
     success: false;
     message: string;
 };
-declare function fetchWithAuth<T = any>(input: string | URL | globalThis.Request, init?: RequestInit): Promise<Response<T>>;
+/**
+ * This fetch is to be used either in middleware or server actions.
+ * It auto refreshes the access token if it has expired, which will not work in Server Components.
+ *
+ * @param input The input can be a string, URL, or Request object. Meant to be the URL of the API endpoint.
+ * @param init Any request options such as method, headers, body, etc.
+ * @template T The type of the response body. Defaults to any.
+ * @returns
+ */
+declare function fetchWithAuthServerSide<T = any>(input: string | URL | globalThis.Request, init?: RequestInit): Promise<Response<T>>;
 
-export { type AuthMiddlewareConfig, type User, fetchWithAuth, withAuth };
+export { type AuthMiddlewareConfig, type User, fetchWithAuth, fetchWithAuthServerSide, withAuth };

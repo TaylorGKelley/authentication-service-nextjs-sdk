@@ -335,7 +335,44 @@ var withAuth = (middleware, options) => {
     }));
   });
 };
+
+// src/apiClient/server/index.ts
+function fetchWithAuthServerSide(input, init) {
+  return __async(this, null, function* () {
+    try {
+      let accessToken = yield getToken_default("accessToken");
+      let csrfToken = yield getToken_default("csrfToken");
+      let xsrfToken = yield getToken_default("_csrfCookie");
+      if (!accessToken || isExpiredToken(accessToken)) {
+        const newTokens = yield refreshTokens_default();
+        accessToken = newTokens.accessToken;
+        csrfToken = newTokens.csrfToken;
+        if (newTokens.xsrfToken) {
+          xsrfToken = newTokens.xsrfToken;
+        }
+      }
+      const response = yield fetch(input, __spreadProps(__spreadValues({}, init), {
+        headers: __spreadProps(__spreadValues({}, init == null ? void 0 : init.headers), {
+          Authorization: `Bearer ${accessToken}`,
+          "X-CSRF-Token": csrfToken,
+          cookie: `_csrf=${xsrfToken};`
+        })
+      }));
+      const data = yield response.json();
+      return {
+        success: true,
+        data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message
+      };
+    }
+  });
+}
 export {
   fetchWithAuth,
+  fetchWithAuthServerSide,
   withAuth
 };
