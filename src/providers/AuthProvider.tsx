@@ -1,26 +1,13 @@
 'use client';
 
 import type User from '@/types/User';
-import React, {
-	createContext,
-	useContext,
-	type PropsWithChildren,
-} from 'react';
+import React, { useContext, type PropsWithChildren } from 'react';
+import authContext from './authContext';
 
 type AuthProviderProps = PropsWithChildren & {
 	user: User | null;
 	permissions: string[];
 };
-
-type AuthContext = {
-	user: User | null;
-	permissions: string[];
-};
-
-export const authContext = createContext<AuthContext>({
-	user: null,
-	permissions: [],
-});
 
 export const useAuthContext = () => {
 	const context = useContext(authContext);
