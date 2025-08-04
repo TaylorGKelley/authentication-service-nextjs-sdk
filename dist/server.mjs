@@ -139,7 +139,6 @@ var parseCookie = (name, cookieHeader) => {
   );
   cookieObj.Name = key;
   cookieObj.Value = value;
-  console.log(cookieObj);
   return cookieObj;
 };
 
