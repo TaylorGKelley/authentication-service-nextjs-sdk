@@ -317,7 +317,15 @@ async function fetchWithAuthServerSide(input, init) {
   }
 }
 
+// src/utils/hasPermission.ts
+async function hasPermission(permissions) {
+  const { permissions: userPermissions } = await getPermissions_default();
+  return permissions.some(
+    (permission) => userPermissions.includes(permission) || permission === config_default.AUTH_PUBLIC_ROUTE_PERMISSION
+  );
+}
+
 exports.fetchWithAuth = fetchWithAuth;
 exports.fetchWithAuthServerSide = fetchWithAuthServerSide;
-exports.getPermissions = getPermissions_default;
+exports.hasPermission = hasPermission;
 exports.withAuth = withAuth;

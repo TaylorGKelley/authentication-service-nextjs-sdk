@@ -21,7 +21,13 @@ var AuthProvider = ({
   permissions,
   children
 }) => {
-  return /* @__PURE__ */ React__default.default.createElement(authContext.Provider, { value: { user, permissions } }, children);
+  return /* @__PURE__ */ React__default.default.createElement(
+    authContext.Provider,
+    {
+      value: { user: user || null, permissions: permissions || [] }
+    },
+    children
+  );
 };
 
 exports.AuthProvider = AuthProvider;

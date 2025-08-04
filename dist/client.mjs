@@ -15,7 +15,13 @@ var AuthProvider = ({
   permissions,
   children
 }) => {
-  return /* @__PURE__ */ React.createElement(authContext.Provider, { value: { user, permissions } }, children);
+  return /* @__PURE__ */ React.createElement(
+    authContext.Provider,
+    {
+      value: { user: user || null, permissions: permissions || [] }
+    },
+    children
+  );
 };
 
 export { AuthProvider, useAuthContext };

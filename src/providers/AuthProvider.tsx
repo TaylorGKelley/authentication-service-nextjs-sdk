@@ -5,8 +5,8 @@ import React, { useContext, type PropsWithChildren } from 'react';
 import authContext from './authContext';
 
 type AuthProviderProps = PropsWithChildren & {
-	user: User | null;
-	permissions: string[];
+	user: User | null | undefined;
+	permissions: string[] | undefined;
 };
 
 export const useAuthContext = () => {
@@ -21,7 +21,8 @@ export const AuthProvider = ({
 	children,
 }: AuthProviderProps) => {
 	return (
-		<authContext.Provider value={{ user, permissions }}>
+		<authContext.Provider
+			value={{ user: user || null, permissions: permissions || [] }}>
 			{children}
 		</authContext.Provider>
 	);

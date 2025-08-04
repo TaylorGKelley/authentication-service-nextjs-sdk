@@ -7,8 +7,8 @@ type AuthContext = {
 };
 
 type AuthProviderProps = PropsWithChildren & {
-    user: User | null;
-    permissions: string[];
+    user: User | null | undefined;
+    permissions: string[] | undefined;
 };
 declare const useAuthContext: () => AuthContext;
 declare const AuthProvider: ({ user, permissions, children, }: AuthProviderProps) => React.JSX.Element;
