@@ -52,4 +52,10 @@ type ErrorResponse = {
  */
 declare function fetchWithAuthServerSide<T = any>(input: string | URL | globalThis.Request, init?: RequestInit): Promise<Response<T>>;
 
-export { type AuthMiddlewareConfig, User, fetchWithAuth, fetchWithAuthServerSide, withAuth };
+type PermissionResponse = {
+    user: User;
+    permissions: string[];
+};
+declare const getPermissions: () => Promise<PermissionResponse>;
+
+export { type AuthMiddlewareConfig, User, fetchWithAuth, fetchWithAuthServerSide, getPermissions, withAuth };

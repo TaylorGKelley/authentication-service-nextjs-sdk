@@ -319,4 +319,5 @@ async function fetchWithAuthServerSide(input, init) {
 
 exports.fetchWithAuth = fetchWithAuth;
 exports.fetchWithAuthServerSide = fetchWithAuthServerSide;
+exports.getPermissions = getPermissions_default;
 exports.withAuth = withAuth;

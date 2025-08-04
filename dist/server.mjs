@@ -311,4 +311,4 @@ async function fetchWithAuthServerSide(input, init) {
   }
 }
 
-export { fetchWithAuth, fetchWithAuthServerSide, withAuth };
+export { fetchWithAuth, fetchWithAuthServerSide, getPermissions_default as getPermissions, withAuth };
