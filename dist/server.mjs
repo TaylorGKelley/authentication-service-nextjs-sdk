@@ -1,4 +1,4 @@
-import React, { cache, useContext } from 'react';
+import { cache } from 'react';
 import { headers, cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
@@ -311,22 +311,5 @@ async function fetchWithAuthServerSide(input, init) {
     };
   }
 }
-var authContext = React.createContext({
-  user: null,
-  permissions: []
-});
 
-// src/providers/AuthProvider.tsx
-var useAuthContext = () => {
-  const context = useContext(authContext);
-  return context;
-};
-var AuthProvider = ({
-  user,
-  permissions,
-  children
-}) => {
-  return /* @__PURE__ */ React.createElement(authContext.Provider, { value: { user, permissions } }, children);
-};
-
-export { AuthProvider, fetchWithAuth, fetchWithAuthServerSide, useAuthContext, withAuth };
+export { fetchWithAuth, fetchWithAuthServerSide, withAuth };

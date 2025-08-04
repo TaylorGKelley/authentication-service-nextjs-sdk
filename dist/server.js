@@ -1,13 +1,12 @@
 'use strict';
 
-var React = require('react');
+var react = require('react');
 var headers = require('next/headers');
 var jwt = require('jsonwebtoken');
 var server = require('next/server');
 
 function _interopDefault (e) { return e && e.__esModule ? e : { default: e }; }
 
-var React__default = /*#__PURE__*/_interopDefault(React);
 var jwt__default = /*#__PURE__*/_interopDefault(jwt);
 
 // src/config.ts
@@ -74,7 +73,7 @@ async function fetchWithAuth(input, init) {
 }
 
 // src/utils/getPermissions.ts
-var getPermissions = React.cache(async () => {
+var getPermissions = react.cache(async () => {
   try {
     const response = await fetchWithAuth(
       `${config_default.AUTH_SERVICE_HOST_URL}/api/v1/user-permissions/${config_default.AUTH_SERVICE_CONNECTED_SERVICE_ID}`,
@@ -318,26 +317,7 @@ async function fetchWithAuthServerSide(input, init) {
     };
   }
 }
-var authContext = React__default.default.createContext({
-  user: null,
-  permissions: []
-});
 
-// src/providers/AuthProvider.tsx
-var useAuthContext = () => {
-  const context = React.useContext(authContext);
-  return context;
-};
-var AuthProvider = ({
-  user,
-  permissions,
-  children
-}) => {
-  return /* @__PURE__ */ React__default.default.createElement(authContext.Provider, { value: { user, permissions } }, children);
-};
-
-exports.AuthProvider = AuthProvider;
 exports.fetchWithAuth = fetchWithAuth;
 exports.fetchWithAuthServerSide = fetchWithAuthServerSide;
-exports.useAuthContext = useAuthContext;
 exports.withAuth = withAuth;
