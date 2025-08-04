@@ -44,10 +44,10 @@ export default async function fetchWithAuthServerSide<T = any>(
 		const response = await fetch(input, {
 			...init,
 			headers: {
-				...init?.headers,
 				Authorization: `Bearer ${accessToken}`,
 				'X-CSRF-Token': csrfToken,
 				cookie: `_csrf=${xsrfToken};`,
+				...init?.headers,
 			},
 		});
 

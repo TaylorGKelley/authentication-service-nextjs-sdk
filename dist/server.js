@@ -53,10 +53,10 @@ async function fetchWithAuth(input, init) {
     const response = await fetch(input, {
       ...init,
       headers: {
-        ...init?.headers,
         Authorization: `Bearer ${accessToken}`,
         "X-CSRF-Token": csrfToken,
-        cookie: `_csrf=${await getToken_default("_csrfCookie")};`
+        cookie: `_csrf=${await getToken_default("_csrfCookie")};`,
+        ...init?.headers
       }
     });
     const data = await response.json();
@@ -298,10 +298,10 @@ async function fetchWithAuthServerSide(input, init) {
     const response = await fetch(input, {
       ...init,
       headers: {
-        ...init?.headers,
         Authorization: `Bearer ${accessToken}`,
         "X-CSRF-Token": csrfToken,
-        cookie: `_csrf=${xsrfToken};`
+        cookie: `_csrf=${xsrfToken};`,
+        ...init?.headers
       }
     });
     const data = await response.json();
