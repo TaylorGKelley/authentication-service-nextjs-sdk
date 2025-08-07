@@ -319,4 +319,4 @@ async function hasPermission(permissions) {
   );
 }
 
-export { fetchWithAuth, fetchWithAuthServerSide, getToken_default as getToken, hasPermission, refreshTokens_default as refreshTokens, withAuth };
+export { fetchWithAuth, fetchWithAuthServerSide, getToken_default as getToken, hasPermission, isExpiredToken, refreshTokens_default as refreshTokens, withAuth };

@@ -56,10 +56,12 @@ declare function hasPermission(permissions: string[]): Promise<boolean>;
 
 declare function getToken(token: 'accessToken' | 'csrfToken' | '_csrfCookie'): Promise<string>;
 
+declare function isExpiredToken(token: string): boolean;
+
 declare const refreshTokens: () => Promise<{
     accessToken: string;
     csrfToken: string;
     xsrfToken: string | undefined;
 }>;
 
-export { type AuthMiddlewareConfig, User, fetchWithAuth, fetchWithAuthServerSide, getToken, hasPermission, refreshTokens, withAuth };
+export { type AuthMiddlewareConfig, User, fetchWithAuth, fetchWithAuthServerSide, getToken, hasPermission, isExpiredToken, refreshTokens, withAuth };

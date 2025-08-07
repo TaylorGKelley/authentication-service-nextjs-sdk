@@ -329,5 +329,6 @@ exports.fetchWithAuth = fetchWithAuth;
 exports.fetchWithAuthServerSide = fetchWithAuthServerSide;
 exports.getToken = getToken_default;
 exports.hasPermission = hasPermission;
+exports.isExpiredToken = isExpiredToken;
 exports.refreshTokens = refreshTokens_default;
 exports.withAuth = withAuth;

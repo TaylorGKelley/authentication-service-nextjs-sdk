@@ -5,6 +5,7 @@ import fetchWithAuth from '@/apiClient';
 import fetchWithAuthServerSide from '@/apiClient/server';
 import { hasPermission } from './utils/hasPermission';
 import getToken from './utils/getToken';
+import { isExpiredToken } from './utils/isExpiredToken';
 import refreshTokens from './utils/refreshTokens';
 
 export {
@@ -13,6 +14,7 @@ export {
   fetchWithAuthServerSide,
   hasPermission,
   getToken,
+  isExpiredToken,
   refreshTokens,
   type AuthMiddlewareConfig,
   type User,
