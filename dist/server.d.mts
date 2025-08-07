@@ -54,4 +54,12 @@ declare function fetchWithAuthServerSide<T = any>(input: string | URL | globalTh
 
 declare function hasPermission(permissions: string[]): Promise<boolean>;
 
-export { type AuthMiddlewareConfig, User, fetchWithAuth, fetchWithAuthServerSide, hasPermission, withAuth };
+declare function getToken(token: 'accessToken' | 'csrfToken' | '_csrfCookie'): Promise<string>;
+
+declare const refreshTokens: () => Promise<{
+    accessToken: string;
+    csrfToken: string;
+    xsrfToken: string | undefined;
+}>;
+
+export { type AuthMiddlewareConfig, User, fetchWithAuth, fetchWithAuthServerSide, getToken, hasPermission, refreshTokens, withAuth };
